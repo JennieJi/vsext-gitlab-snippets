@@ -8,7 +8,7 @@ import configKey from './configKey';
 import registerStaredView from './views/staredView';
 import registerHostsView from './views/hostsView';
 import { starSnippet, unstarSnippet } from './starManager';
-import { Snippet, StaredSnippet } from './types';
+import { Snippet, StaredSnippet, Host } from './types';
 
 export function activate(context: ExtensionContext) {
   const { subscriptions, globalState } = context;
@@ -27,7 +27,7 @@ export function activate(context: ExtensionContext) {
         },
       ],
       ['publish', () => publish(globalState)],
-      ['reload', hostSnippetsProvider.reload],
+      ['reload', (host: Host) => hostSnippetsProvider.reload(host)],
       [
         'star',
         (snippet: Snippet) => {

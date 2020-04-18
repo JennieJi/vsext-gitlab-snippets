@@ -16,6 +16,8 @@ import commandName from '../commandName';
 
 class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
+  readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
+
   private state: Memento;
   private activeLimit: number;
 
@@ -28,8 +30,6 @@ class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
     this.activeLimit = 20;
   }
 
-  readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
-
   constructor(state: Memento) {
     this.state = state;
     this.activeLimit = 20;
@@ -40,14 +40,14 @@ class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
   }
 
   private getHostItem({ host }: Host): TreeItem {
+    const isExpanded = this.activeHost === host;
     return {
       label: host.replace(/\w+:\/\//, ''),
       id: host,
       contextValue: 'host',
-      collapsibleState:
-        this.activeHost === host
-          ? TreeItemCollapsibleState.Expanded
-          : TreeItemCollapsibleState.Collapsed,
+      collapsibleState: isExpanded
+        ? TreeItemCollapsibleState.Expanded
+        : TreeItemCollapsibleState.Collapsed,
       iconPath: ThemeIcon.Folder,
       command: {
         command: commandName('toggleHost'),
