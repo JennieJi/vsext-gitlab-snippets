@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { StaredSnippet } from '../types';
-import getSnippetItem from '../getSnippetItem';
+import getSnippetItem from './getSnippetItem';
 import { starManager } from '../starManager';
 
 class SnippetsProvider implements vscode.TreeDataProvider<StaredSnippet> {

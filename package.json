@@ -102,7 +102,7 @@
         },
         {
           "command": "gitlabSnippets.star",
-          "when": "view == 'gitlabSnippetsExplorer-all' && viewItem == snippet",
+          "when": "view =~ /gitlabSnippetsExplorer-(all|mine)/ && viewItem == snippet",
           "group": "inline"
         },
         {
@@ -133,6 +133,10 @@
         {
           "id": "gitlabSnippetsExplorer-stared",
           "name": "Stared"
+        },
+        {
+          "id": "gitlabSnippetsExplorer-mine",
+          "name": "My snippets"
         },
         {
           "id": "gitlabSnippetsExplorer-all",

@@ -7,6 +7,7 @@ import publish from './publishSnippet';
 import configKey from './configKey';
 import registerStaredView from './views/staredView';
 import registerHostsView from './views/hostsView';
+import registerMyView from './views/myView';
 import { starSnippet, unstarSnippet } from './starManager';
 import starById from './starById';
 import viewSnippet from './viewSnippet';
@@ -17,6 +18,8 @@ export function activate(context: ExtensionContext) {
   const { subscriptions, globalState } = context;
   const { dataProvider: staredProvider } = registerStaredView(globalState);
   const { dataProvider: hostSnippetsProvider } = registerHostsView(globalState);
+  const { dataProvider: mySnippetsProvider } = registerMyView(globalState);
+  mySnippetsProvider.openLastest();
 
   subscriptions.concat(
     [
@@ -26,6 +29,8 @@ export function activate(context: ExtensionContext) {
           const { registry } = (await addHost(globalState)) || {};
           if (registry) {
             globalState.update(configKey('lastUseHost'), registry.host);
+            hostSnippetsProvider.openLastest();
+            mySnippetsProvider.openLastest();
           }
         },
       ],

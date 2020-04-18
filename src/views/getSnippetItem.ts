@@ -1,6 +1,6 @@
 import { ThemeIcon, TreeItem } from 'vscode';
-import { Snippet } from './types';
-import commandName from './commandName';
+import { Snippet } from '../types';
+import commandName from '../commandName';
 
 export default function getSnippetItem(
   prefix: string,
