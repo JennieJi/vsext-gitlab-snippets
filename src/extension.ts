@@ -8,6 +8,7 @@ import configKey from './configKey';
 import registerStaredView from './views/staredView';
 import registerHostsView from './views/hostsView';
 import { starSnippet, unstarSnippet } from './starManager';
+import starById from './starById';
 import viewSnippet from './viewSnippet';
 import { Snippet, StaredSnippet, Host } from './types';
 import downloadSnippet from './downloadSnippet';
@@ -34,6 +35,13 @@ export function activate(context: ExtensionContext) {
         'star',
         (snippet: Snippet) => {
           starSnippet(globalState, snippet);
+          staredProvider.reload();
+        },
+      ],
+      [
+        'starById',
+        async () => {
+          await starById(globalState);
           staredProvider.reload();
         },
       ],

@@ -7,7 +7,7 @@ export default function listManager<T>(
   state: Memento
 ) {
   const key = configKey(_key);
-  const get = (id?: any) => {
+  const get = () => {
     const existing = (state.get(key) || []) as T[];
     return existing.filter((item) => !!getId(item));
   };

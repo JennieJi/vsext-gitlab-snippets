@@ -44,6 +44,12 @@
         "icon": "$(star-empty)"
       },
       {
+        "command": "gitlabSnippets.starById",
+        "category": "Gitlab Snippets",
+        "title": "Add snippet by ID",
+        "icon": "$(add)"
+      },
+      {
         "command": "gitlabSnippets.unstar",
         "title": "Unstar",
         "icon": "$(star-full)"
@@ -78,6 +84,9 @@
         },
         {
           "command": "gitlabSnippets.addHost"
+        },
+        {
+          "command": "gitlabSnippets.starById"
         }
       ],
       "view/item/context": [
@@ -100,6 +109,13 @@
           "command": "gitlabSnippets.unstar",
           "when": "view == gitlabSnippetsExplorer-stared && viewItem == snippet",
           "group": "inline"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "gitlabSnippets.starById",
+          "when": "view == gitlabSnippetsExplorer-stared",
+          "group": "navigation"
         }
       ]
     },

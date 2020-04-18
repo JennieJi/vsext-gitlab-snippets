@@ -45,6 +45,10 @@ class SnippetRegistry {
     return this.get('snippets').then((res) => res.json());
   }
 
+  public getSnippet(id: number): Promise<Snippet> {
+    return this.get(`snippets/${id}`).then((res) => res.json());
+  }
+
   public getSnippetContent(id: number): Promise<string> {
     return this.get(`snippets/${id}/raw`).then((res) => res.text());
   }

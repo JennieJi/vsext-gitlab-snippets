@@ -18,6 +18,7 @@ export function starSnippet(state: Memento, snippet: Snippet) {
     starTime: Date.now(),
   });
 }
+
 export function unstarSnippet(state: Memento, snippet: StaredSnippet) {
   return starManager(state).remove(snippet);
 }
