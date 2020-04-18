@@ -4,11 +4,10 @@ export interface Host {
   version: number;
 }
 
-export interface StaredSnippet {
+export type StaredSnippet = Snippet & {
   host: string;
   starTime: number;
-  snippet: Snippet;
-}
+};
 
 export interface Snippet {
   id: number;

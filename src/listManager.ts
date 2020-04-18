@@ -7,7 +7,8 @@ export default function listManager<T>(
   state: Memento
 ) {
   const key = configKey(_key);
-  const get = () => (state.get(key) || {}) as T[];
+  const get = () =>
+    ((state.get(key) || []) as T[]).filter((item) => !!getId(item));
   const add = (item: T) => {
     const existing = get();
     const id = getId(item);

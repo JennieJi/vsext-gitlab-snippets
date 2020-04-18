@@ -19,7 +19,7 @@ class SnippetsProvider implements vscode.TreeDataProvider<StaredSnippet> {
     this._onDidChangeTreeData.fire();
   }
   public getTreeItem(stared: StaredSnippet): vscode.TreeItem {
-    return getSnippetItem('stared-', stared.snippet);
+    return getSnippetItem('stared-', stared);
   }
   public getChildren(): StaredSnippet[] {
     return starManager(this.state).get();

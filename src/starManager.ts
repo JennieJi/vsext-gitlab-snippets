@@ -5,7 +5,7 @@ import { Memento } from 'vscode';
 export function starManager(state: Memento) {
   return listManager<StaredSnippet>(
     'stared',
-    (stared: StaredSnippet) => stared.snippet.raw_url,
+    (stared: StaredSnippet) => stared.raw_url,
     state
   );
 }
@@ -13,8 +13,8 @@ export function starManager(state: Memento) {
 export function starSnippet(state: Memento, snippet: Snippet) {
   const host = snippet.raw_url.replace(/^(\w+:\/\/)?([\w-\.]+)\/.*/, '$1$2');
   return starManager(state).add({
+    ...snippet,
     host,
-    snippet,
     starTime: Date.now(),
   });
 }
