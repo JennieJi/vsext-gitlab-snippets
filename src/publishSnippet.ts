@@ -1,13 +1,11 @@
-import { ExtensionContext, window } from 'vscode';
-import configKey from './configKey';
+import { window, Memento } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
 import addHost from './addHost';
 import { Host } from './types';
 import { VISIBILITY } from './constants';
+import hostManager from './hostManager';
 
-const KEY = configKey('hosts');
-
-export default async function publish(context: ExtensionContext) {
+export default async function publish(state: Memento) {
   const { activeTextEditor } = window;
   if (!activeTextEditor) {
     window.showErrorMessage('Please open the file first!');
@@ -19,10 +17,10 @@ export default async function publish(context: ExtensionContext) {
     return;
   }
 
-  const hosts = context.globalState.get(KEY) as Host[] | undefined;
+  const hosts = hostManager(state).get();
   let api;
   if (!hosts || !hosts.length) {
-    const res = await addHost(context);
+    const res = await addHost(state);
     api = res?.registry;
   } else {
     const host = await window.showQuickPick(

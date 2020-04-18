@@ -1,7 +1,7 @@
 import { CMD_PREFIX } from './constants';
 
-type Key = 'hosts';
+export type ConfigKey = 'hosts' | 'lastUseHost' | 'stared';
 
-export default function configKey(key: Key) {
+export default function configKey(key: ConfigKey) {
   return `${CMD_PREFIX}${key}`;
 }

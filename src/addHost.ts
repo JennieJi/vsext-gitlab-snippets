@@ -1,11 +1,10 @@
-import { ExtensionContext, window } from 'vscode';
-import configKey from './configKey';
+import { window, Memento } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
+import hostManager from './hostManager';
 
 const PROTOCOL = 'https://';
-const KEY = configKey('hosts');
 
-export default async function addHost(context: ExtensionContext) {
+export default async function addHost(state: Memento) {
   let host = await window.showInputBox({
     ignoreFocusOut: true,
     placeHolder: 'Enter your gitlab host',
@@ -14,7 +13,7 @@ export default async function addHost(context: ExtensionContext) {
   if (!host) {
     return;
   }
-  if (/^https:\/\//.test(host)) {
+  if (!host.startsWith(PROTOCOL)) {
     host = PROTOCOL + host;
   }
   const token = await window.showInputBox({
@@ -40,15 +39,7 @@ export default async function addHost(context: ExtensionContext) {
   const api = new SnippetRegistry(registry);
   const snippets = await api.getSnippets();
 
-  const { globalState } = context;
-  const current = globalState.get(KEY);
-  let updatedValue;
-  if (Array.isArray(current)) {
-    updatedValue = current.filter((r) => r.host !== host).concat(registry);
-  } else {
-    updatedValue = [registry];
-  }
-  globalState.update(KEY, updatedValue);
+  hostManager(state).add(registry);
 
   return {
     registry: api,
