@@ -2,13 +2,16 @@ import * as vscode from 'vscode';
 import { Snippet } from './types';
 import commandName from './commandName';
 
-export default function getSnippetItem(snippet: Snippet): vscode.TreeItem {
-  const { id, title, file_name, description } = snippet;
+export default function getSnippetItem(
+  prefix: string,
+  snippet: Snippet
+): vscode.TreeItem {
+  const { raw_url: id, title: label, file_name: description } = snippet;
   return {
-    label: `${file_name} - ${title}`,
-    id: '' + id,
+    label,
+    id: prefix + id,
     contextValue: 'snippet',
-    description: description || '',
+    description,
     iconPath: vscode.ThemeIcon.File,
     command: {
       command: commandName('viewSnippet'),

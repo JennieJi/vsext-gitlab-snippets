@@ -7,14 +7,13 @@ import publish from './publishSnippet';
 import configKey from './configKey';
 import registerStaredView from './views/staredView';
 import registerHostsView from './views/hostsView';
-import starManager from './starManager';
-import { Snippet } from './types';
+import { starSnippet, unstarSnippet } from './starManager';
+import { Snippet, StaredSnippet } from './types';
 
 export function activate(context: ExtensionContext) {
   const { subscriptions, globalState } = context;
   const { dataProvider: staredProvider } = registerStaredView(globalState);
   const { dataProvider: hostSnippetsProvider } = registerHostsView(globalState);
-  // const stared = starManager(globalState);
 
   subscriptions.concat(
     [
@@ -31,23 +30,17 @@ export function activate(context: ExtensionContext) {
       ['reload', hostSnippetsProvider.reload],
       [
         'star',
-        // (host: string, snippet: Snippet) => {
-        //   stared.add({
-        //     host,
-        //     snippet,
-        //     starTime: Date.now(),
-        //   });
-        // staredProvider.reload();
-        // },
-        (...args: any[]) => console.log(args),
+        (snippet: Snippet) => {
+          starSnippet(globalState, snippet);
+          staredProvider.reload();
+        },
       ],
       [
         'unstar',
-        // (index: number) => {
-        //   stared.remove(index);
-        // staredProvider.reload();
-        // },
-        (...args: any[]) => console.log(args),
+        (snippet: StaredSnippet) => {
+          unstarSnippet(globalState, snippet);
+          staredProvider.reload();
+        },
       ],
       ['download', () => {}],
       ['viewSnippet', () => {}],

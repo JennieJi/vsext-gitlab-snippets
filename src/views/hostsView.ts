@@ -41,7 +41,7 @@ class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
 
   private getHostItem({ host }: Host): TreeItem {
     return {
-      label: host,
+      label: host.replace(/\w+:\/\//, ''),
       id: host,
       contextValue: 'host',
       collapsibleState:
@@ -68,7 +68,10 @@ class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
     };
   }
 
-  public reload() {
+  public reload(host?: Host) {
+    if (host) {
+      this.activeHost = host.host;
+    }
     this._onDidChangeTreeData.fire();
   }
   public openLastest() {
@@ -98,7 +101,7 @@ class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
       return this.getHostItem(el as Host);
     }
     if ((el as Snippet).id) {
-      return getSnippetItem(el as Snippet);
+      return getSnippetItem('host-', el as Snippet);
     }
     return this.getLoadMoreItem();
   }
