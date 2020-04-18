@@ -14,6 +14,8 @@ import SnippetRegistry from '../SnippetRegistry';
 import hostManager from '../hostManager';
 import commandName from '../commandName';
 
+const PER_PAGE = 20;
+
 class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
@@ -27,12 +29,12 @@ class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
   }
   set activeHost(val: string) {
     this._activeHost = val;
-    this.activeLimit = 20;
+    this.activeLimit = PER_PAGE;
   }
 
   constructor(state: Memento) {
     this.state = state;
-    this.activeLimit = 20;
+    this.activeLimit = PER_PAGE;
   }
 
   private getHosts() {
@@ -79,7 +81,10 @@ class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
     this.activeHost = hosts?.[0]?.host;
     this.reload();
   }
-  public loadMore() {}
+  public loadMore() {
+    this.activeLimit += PER_PAGE;
+    this._onDidChangeTreeData.fire();
+  }
 
   public getChildren(el?: Host): Thenable<Host[] | Snippet[]> {
     if (!el) {

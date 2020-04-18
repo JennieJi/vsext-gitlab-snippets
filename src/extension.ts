@@ -50,6 +50,7 @@ export function activate(context: ExtensionContext) {
           downloadSnippet(globalState, snippet),
       ],
       ['viewSnippet', viewSnippet],
+      ['exploreMore', () => hostSnippetsProvider.loadMore()],
     ].map(([cmd, callback]) =>
       commands.registerCommand(
         commandName(cmd as Command),
