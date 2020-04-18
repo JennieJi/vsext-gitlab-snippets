@@ -4,11 +4,11 @@ import hostManager from './hostManager';
 
 const PROTOCOL = 'https://';
 
-export default async function addHost(state: Memento) {
+export default async function addHost(state: Memento, defaultValue?: string) {
   let host = await window.showInputBox({
     ignoreFocusOut: true,
     placeHolder: 'Enter your gitlab host',
-    value: PROTOCOL,
+    value: defaultValue || PROTOCOL,
   });
   if (!host) {
     return;

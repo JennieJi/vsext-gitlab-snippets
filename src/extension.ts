@@ -10,6 +10,7 @@ import registerHostsView from './views/hostsView';
 import { starSnippet, unstarSnippet } from './starManager';
 import viewSnippet from './viewSnippet';
 import { Snippet, StaredSnippet, Host } from './types';
+import downloadSnippet from './downloadSnippet';
 
 export function activate(context: ExtensionContext) {
   const { subscriptions, globalState } = context;
@@ -43,7 +44,11 @@ export function activate(context: ExtensionContext) {
           staredProvider.reload();
         },
       ],
-      ['download', () => {}],
+      [
+        'download',
+        (snippet: StaredSnippet | Snippet) =>
+          downloadSnippet(globalState, snippet),
+      ],
       ['viewSnippet', viewSnippet],
     ].map(([cmd, callback]) =>
       commands.registerCommand(

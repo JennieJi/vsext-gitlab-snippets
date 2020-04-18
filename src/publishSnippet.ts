@@ -17,7 +17,8 @@ export default async function publish(state: Memento) {
     return;
   }
 
-  const hosts = hostManager(state).get();
+  const manageHosts = hostManager(state);
+  const hosts = manageHosts.get();
   let api;
   if (!hosts || !hosts.length) {
     const res = await addHost(state);
@@ -34,7 +35,7 @@ export default async function publish(state: Memento) {
     if (!host) {
       return;
     }
-    api = new SnippetRegistry(hosts.find((h) => h.host === host) as Host);
+    api = new SnippetRegistry(manageHosts.getById(host) as Host);
   }
   const fileName = await window.showInputBox({
     ignoreFocusOut: true,
