@@ -1,13 +1,14 @@
 import { CMD_PREFIX } from './constants';
 
-type Command =
-  | 'showStared'
+export type Command =
   | 'addHost'
   | 'publish'
   | 'download'
   | 'star'
   | 'unstar'
-  | 'view';
+  | 'viewSnippet'
+  | 'toggleHost'
+  | 'exploreMore';
 
 export default function commandName(shorthand: Command) {
   return `${CMD_PREFIX}${shorthand}`;

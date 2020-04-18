@@ -1,26 +1,63 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import { ExtensionContext, window, commands } from 'vscode';
+import commandName, { Command } from './commandName';
+import addHost from './addHost';
+import publish from './publishSnippet';
+import configKey from './configKey';
+import registerStaredView from './views/staredView';
+import registerHostsView from './views/hostsView';
+import starManager from './starManager';
+import { Snippet } from './types';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
+  const { subscriptions, globalState } = context;
+  const { dataProvider: staredProvider } = registerStaredView(globalState);
+  const { dataProvider: hostSnippetsProvider } = registerHostsView(globalState);
+  // const stared = starManager(globalState);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "gitlab-snippets" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
-	});
-
-	context.subscriptions.push(disposable);
+  subscriptions.concat(
+    [
+      [
+        'addHost',
+        async () => {
+          const { registry } = (await addHost(globalState)) || {};
+          if (registry) {
+            globalState.update(configKey('lastUseHost'), registry.host);
+          }
+        },
+      ],
+      ['publish', () => publish(globalState)],
+      ['reload', hostSnippetsProvider.reload],
+      [
+        'star',
+        // (host: string, snippet: Snippet) => {
+        //   stared.add({
+        //     host,
+        //     snippet,
+        //     starTime: Date.now(),
+        //   });
+        // staredProvider.reload();
+        // },
+        (...args: any[]) => console.log(args),
+      ],
+      [
+        'unstar',
+        // (index: number) => {
+        //   stared.remove(index);
+        // staredProvider.reload();
+        // },
+        (...args: any[]) => console.log(args),
+      ],
+      ['download', () => {}],
+      ['viewSnippet', () => {}],
+    ].map(([cmd, callback]) =>
+      commands.registerCommand(
+        commandName(cmd as Command),
+        callback as () => void
+      )
+    )
+  );
 }
 
 // this method is called when your extension is deactivated

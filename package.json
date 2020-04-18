@@ -8,6 +8,13 @@
     "name": "Jennie Ji",
     "email": "jennie.ji@hotmail.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JennieJi/vsext-gitlab-snippets"
+  },
+  "bugs": {
+    "url": "https://github.com/JennieJi/vsext-gitlab-snippets/issues"
+  },
   "license": "MIT",
   "engines": {
     "vscode": "^1.43.0"
@@ -16,47 +23,56 @@
     "Other"
   ],
   "activationEvents": [
-    "onViewContainer:gitlab-snippets-explorer"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "gitlabSnippets.showStared",
-        "category": "Gitlab snippets",
-        "title": "Show stared"
-      },
-      {
         "command": "gitlabSnippets.publish",
-        "category": "Gitlab snippets",
+        "category": "Gitlab Snippets",
         "title": "Publish snippet"
       },
       {
         "command": "gitlabSnippets.addHost",
-        "category": "Gitlab snippets",
+        "category": "Gitlab Snippets",
         "title": "Add gitlab host"
       },
       {
-        "command": "gitlabSnippets.reload",
-        "title": "Reload snippets",
-        "icon": "resources/icons/reload.svg"
-      },
-      {
         "command": "gitlabSnippets.star",
-        "title": "Reload snippets",
-        "icon": "resources/icons/star.svg"
+        "title": "Star",
+        "icon": "$(star-empty)"
       },
       {
         "command": "gitlabSnippets.unstar",
-        "title": "Reload snippets",
-        "icon": "resources/icons/star-filled.svg"
+        "title": "Unstar",
+        "icon": "$(star-full)"
+      },
+      {
+        "command": "gitlabSnippets.download",
+        "title": "Download",
+        "icon": "$(save)"
+      },
+      {
+        "command": "gitlabSnippets.viewSnippet",
+        "title": "View"
+      },
+      {
+        "command": "gitlabSnippets.toggleHost",
+        "title": "Expand/Collapse"
+      },
+      {
+        "command": "gitlabSnippets.exploreMore",
+        "title": "More"
+      },
+      {
+        "command": "gitlabSnippets.reload",
+        "title": "Reload",
+        "icon": "$(sync)"
       }
     ],
     "menus": {
       "commandPalette": [
-        {
-          "command": "gitlabSnippets.showStared"
-        },
         {
           "command": "gitlabSnippets.publish"
         },
@@ -66,25 +82,24 @@
       ],
       "view/item/context": [
         {
+          "command": "gitlabSnippets.reload",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem == host",
+          "group": "inline"
+        },
+        {
           "command": "gitlabSnippets.download",
-          "when": "view =~ /gitlabSnippets/ && viewItem == snippet",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem == snippet",
           "group": "inline"
         },
         {
           "command": "gitlabSnippets.star",
-          "when": "view == gitlabSnippetsExplorer-all && viewItem == snippet",
+          "when": "view == 'gitlabSnippetsExplorer-all' && viewItem == snippet",
           "group": "inline"
         },
         {
           "command": "gitlabSnippets.unstar",
           "when": "view == gitlabSnippetsExplorer-stared && viewItem == snippet",
           "group": "inline"
-        }
-      ],
-      "view/title": [
-        {
-          "command": "gitlabSnippets.reload",
-          "when": "view =~ /gitlabSnippets/"
         }
       ]
     },
@@ -93,7 +108,7 @@
         {
           "id": "gitlabSnippetsExplorer",
           "title": "Gitlab Snippets Explorer",
-          "icon": "resources/icons/gitlab-icon.svg"
+          "icon": "resources/icons/gitlab-logo.svg"
         }
       ]
     },
@@ -105,7 +120,7 @@
         },
         {
           "id": "gitlabSnippetsExplorer-all",
-          "name": "Accessable snippets"
+          "name": "Explore snippets"
         }
       ]
     }

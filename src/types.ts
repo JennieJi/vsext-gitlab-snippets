@@ -4,6 +4,12 @@ export interface Host {
   version: number;
 }
 
+export interface StaredSnippet {
+  host: string;
+  starTime: number;
+  snippet: Snippet;
+}
+
 export interface Snippet {
   id: number;
   title: string;

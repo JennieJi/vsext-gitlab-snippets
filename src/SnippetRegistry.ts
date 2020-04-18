@@ -1,8 +1,9 @@
 import fetch from 'node-fetch';
 import { Host, Snippet, NewSnippet } from './types';
+import { URLSearchParams } from 'url';
 
 class SnippetRegistry {
-  private host: Host;
+  public host: Host;
   private headers: { [key: string]: string };
 
   constructor(host: Host) {
@@ -30,7 +31,17 @@ class SnippetRegistry {
     });
   }
 
-  public getSnippets(): Promise<Snippet[]> {
+  public getSnippets(page?: number, perPage?: number): Promise<Snippet[]> {
+    const search = new URLSearchParams({
+      page: page ? page.toString() : undefined,
+      per_page: perPage ? perPage.toString() : undefined,
+    });
+    return this.get('snippets/public?' + search.toString()).then((res) =>
+      res.json()
+    );
+  }
+
+  public getUserSnippets(): Promise<Snippet[]> {
     return this.get('snippets').then((res) => res.json());
   }
 
