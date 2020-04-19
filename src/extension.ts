@@ -1,6 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, window } from 'vscode';
+import { ExtensionContext, commands, window, TreeView } from 'vscode';
 import commandName, { Command } from './commandName';
 import addHost from './addHost';
 import publish from './publishSnippet';
@@ -14,12 +14,21 @@ import viewSnippet from './viewSnippet';
 import { Snippet, StaredSnippet, Host } from './types';
 import downloadSnippet from './downloadSnippet';
 
+let views = [] as TreeView<any>[];
+
 export function activate(context: ExtensionContext) {
   const { subscriptions, globalState } = context;
-  const { dataProvider: staredProvider } = registerStaredView(globalState);
-  const { dataProvider: hostSnippetsProvider } = registerHostsView(globalState);
-  const { dataProvider: mySnippetsProvider } = registerMyView(globalState);
-  mySnippetsProvider.openLastest();
+  const { view: staredView, dataProvider: staredProvider } = registerStaredView(
+    globalState
+  );
+  const {
+    view: hostsView,
+    dataProvider: hostSnippetsProvider,
+  } = registerHostsView(globalState);
+  const { view: myView, dataProvider: mySnippetsProvider } = registerMyView(
+    globalState
+  );
+  views = [staredView, hostsView, myView];
 
   subscriptions.concat(
     [
@@ -81,7 +90,10 @@ export function activate(context: ExtensionContext) {
       )
     )
   );
+  mySnippetsProvider.openLastest();
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  views.forEach((v) => v.dispose());
+}
