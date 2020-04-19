@@ -72,7 +72,12 @@
         "title": "More"
       },
       {
-        "command": "gitlabSnippets.reload",
+        "command": "gitlabSnippets.reloadMySnippets",
+        "title": "Reload",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "gitlabSnippets.reloadExploreSnippets",
         "title": "Reload",
         "icon": "$(sync)"
       }
@@ -91,8 +96,13 @@
       ],
       "view/item/context": [
         {
-          "command": "gitlabSnippets.reload",
-          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem == host",
+          "command": "gitlabSnippets.reloadMySnippets",
+          "when": "view == gitlabSnippetsExplorer-mine && viewItem == host",
+          "group": "inline"
+        },
+        {
+          "command": "gitlabSnippets.reloadExploreSnippets",
+          "when": "view == gitlabSnippetsExplorer-all && viewItem == host",
           "group": "inline"
         },
         {

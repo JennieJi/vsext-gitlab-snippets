@@ -1,6 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands } from 'vscode';
+import { ExtensionContext, commands, window } from 'vscode';
 import commandName, { Command } from './commandName';
 import addHost from './addHost';
 import publish from './publishSnippet';
@@ -34,8 +34,18 @@ export function activate(context: ExtensionContext) {
           }
         },
       ],
-      ['publish', () => publish(globalState)],
-      ['reload', (host: Host) => hostSnippetsProvider.reload(host)],
+      [
+        'publish',
+        async () => {
+          const res = await publish(globalState);
+          mySnippetsProvider.reload(res?.registry?.host);
+        },
+      ],
+      ['reloadMySnippets', (host: Host) => mySnippetsProvider.reload(host)],
+      [
+        'reloadExploreSnippets',
+        (host: Host) => hostSnippetsProvider.reload(host),
+      ],
       [
         'star',
         (snippet: Snippet) => {

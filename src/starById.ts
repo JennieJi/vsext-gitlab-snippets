@@ -1,37 +1,20 @@
 import { Memento, window } from 'vscode';
 import hostManager from './hostManager';
 import SnippetRegistry from './SnippetRegistry';
-import { Host } from './types';
 import { starManager } from './starManager';
-import addHost from './addHost';
-
-const ADD_NEW = 'Add new...';
+import chooseHost from './chooseHost';
 
 export default async function starById(state: Memento) {
-  const hostManage = hostManager(state);
-  const options = hostManage
-    .get()
-    .map(({ host }) => host)
-    .concat(ADD_NEW);
-  const host = await window.showQuickPick(options, {
-    placeHolder: 'Where do you add snippet from?',
-  });
-  if (!host) {
-    return;
-  }
-  let hostConfig;
-  if (host === ADD_NEW) {
-    const res = await addHost(state);
-    hostConfig = res?.registry?.host;
-  } else {
-    hostConfig = hostManage.getById(host) as Host;
-  }
+  const hostConfig = await chooseHost(
+    state,
+    'Where would you add snippet from?'
+  );
   if (!hostConfig) {
     return;
   }
 
   const id = await window.showInputBox({
-    placeHolder: 'Enter snippet ID',
+    prompt: 'Enter snippet ID',
   });
   if (!id) {
     return;
@@ -39,12 +22,14 @@ export default async function starById(state: Memento) {
   const registry = new SnippetRegistry(hostConfig);
   const snippet = await registry.getSnippet(parseInt(id, 10));
   if (!snippet) {
-    window.showErrorMessage(`Couldn't find snippet #${id} on ${host}!`);
+    window.showErrorMessage(
+      `Couldn't find snippet #${id} on ${hostConfig.host}!`
+    );
     return;
   }
   starManager(state).add({
     ...snippet,
-    host,
+    host: hostConfig.host,
     starTime: Date.now(),
   });
 }

@@ -7,7 +7,7 @@ const PROTOCOL = 'https://';
 export default async function addHost(state: Memento, defaultValue?: string) {
   let host = await window.showInputBox({
     ignoreFocusOut: true,
-    placeHolder: 'Enter your gitlab host',
+    prompt: 'Enter your gitlab host',
     value: defaultValue || PROTOCOL,
   });
   if (!host) {
@@ -18,7 +18,7 @@ export default async function addHost(state: Memento, defaultValue?: string) {
   }
   const token = await window.showInputBox({
     ignoreFocusOut: true,
-    placeHolder: 'Enter your gitlab token',
+    prompt: 'Enter your gitlab token',
   });
   if (!token) {
     return;

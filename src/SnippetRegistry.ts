@@ -10,6 +10,7 @@ class SnippetRegistry {
     this.host = host;
     this.headers = {
       'PRIVATE-TOKEN': host.token,
+      'Content-Type': 'application/json',
     };
   }
 

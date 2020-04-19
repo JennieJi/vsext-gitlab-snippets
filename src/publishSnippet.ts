@@ -4,6 +4,7 @@ import addHost from './addHost';
 import { Host } from './types';
 import { VISIBILITY } from './constants';
 import hostManager from './hostManager';
+import chooseHost from './chooseHost';
 
 export default async function publish(state: Memento) {
   const { activeTextEditor } = window;
@@ -24,22 +25,15 @@ export default async function publish(state: Memento) {
     const res = await addHost(state);
     api = res?.registry;
   } else {
-    const host = await window.showQuickPick(
-      hosts.map(({ host }) => host),
-      {
-        canPickMany: false,
-        placeHolder: 'Choose host to publish',
-        ignoreFocusOut: true,
-      }
-    );
-    if (!host) {
+    const hostConfig = await chooseHost(state);
+    if (!hostConfig) {
       return;
     }
-    api = new SnippetRegistry(manageHosts.getById(host) as Host);
+    api = new SnippetRegistry(hostConfig);
   }
   const fileName = await window.showInputBox({
     ignoreFocusOut: true,
-    placeHolder: 'Enter file name',
+    prompt: 'Enter file name',
     value: activeTextEditor.document.fileName,
   });
   if (!fileName) {
@@ -47,7 +41,7 @@ export default async function publish(state: Memento) {
   }
   const title = await window.showInputBox({
     ignoreFocusOut: true,
-    placeHolder: 'Enter a title',
+    prompt: 'Enter a title',
   });
   if (!title) {
     return;
@@ -55,7 +49,7 @@ export default async function publish(state: Memento) {
   const description =
     (await window.showInputBox({
       ignoreFocusOut: true,
-      placeHolder: 'Enter a brief description',
+      prompt: 'Enter a brief description',
     })) || null;
   const visibility =
     (await window.showQuickPick(Object.values(VISIBILITY), {
@@ -63,12 +57,16 @@ export default async function publish(state: Memento) {
       placeHolder: 'Choose visibility',
       ignoreFocusOut: true,
     })) || VISIBILITY.private;
-
-  return await api?.publish({
+  const snippet = {
     file_name: fileName,
     title,
     description,
     visibility,
     content,
-  });
+  };
+  await api?.publish(snippet);
+  return {
+    snippet,
+    registry: api,
+  };
 }
