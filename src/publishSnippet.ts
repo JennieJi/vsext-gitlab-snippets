@@ -33,7 +33,7 @@ export default async function publish(state: Memento) {
   }
   const fileName = await window.showInputBox({
     ignoreFocusOut: true,
-    prompt: 'Enter file name',
+    prompt: 'Enter file name with extention. E.g., "example.js".',
     value: activeTextEditor.document.fileName,
   });
   if (!fileName) {
@@ -42,6 +42,11 @@ export default async function publish(state: Memento) {
   const title = await window.showInputBox({
     ignoreFocusOut: true,
     prompt: 'Enter a title',
+    validateInput(value) {
+      if (!value || !value.trim()) {
+        return 'Title is required!';
+      }
+    },
   });
   if (!title) {
     return;
@@ -49,7 +54,7 @@ export default async function publish(state: Memento) {
   const description =
     (await window.showInputBox({
       ignoreFocusOut: true,
-      prompt: 'Enter a brief description',
+      prompt: '[Optional]Enter a brief description',
     })) || null;
   const visibility =
     (await window.showQuickPick(Object.values(VISIBILITY), {

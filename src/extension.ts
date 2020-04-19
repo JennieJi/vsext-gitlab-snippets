@@ -30,60 +30,60 @@ export function activate(context: ExtensionContext) {
   );
   views = [staredView, hostsView, myView];
 
-  subscriptions.concat(
+  [
     [
-      [
-        'addHost',
-        async () => {
-          const { registry } = (await addHost(globalState)) || {};
-          if (registry) {
-            globalState.update(configKey('lastUseHost'), registry.host);
-            hostSnippetsProvider.openLastest();
-            mySnippetsProvider.openLastest();
-          }
-        },
-      ],
-      [
-        'publish',
-        async () => {
-          const res = await publish(globalState);
-          mySnippetsProvider.reload(res?.registry?.host);
-        },
-      ],
-      ['reloadMySnippets', (host: Host) => mySnippetsProvider.reload(host)],
-      [
-        'reloadExploreSnippets',
-        (host: Host) => hostSnippetsProvider.reload(host),
-      ],
-      [
-        'star',
-        (snippet: Snippet) => {
-          starSnippet(globalState, snippet);
-          staredProvider.reload();
-        },
-      ],
-      [
-        'starById',
-        async () => {
-          await starById(globalState);
-          staredProvider.reload();
-        },
-      ],
-      [
-        'unstar',
-        (snippet: StaredSnippet) => {
-          unstarSnippet(globalState, snippet);
-          staredProvider.reload();
-        },
-      ],
-      [
-        'download',
-        (snippet: StaredSnippet | Snippet) =>
-          downloadSnippet(globalState, snippet),
-      ],
-      ['viewSnippet', viewSnippet],
-      ['exploreMore', () => hostSnippetsProvider.loadMore()],
-    ].map(([cmd, callback]) =>
+      'addHost',
+      async () => {
+        const { registry } = (await addHost(globalState)) || {};
+        if (registry) {
+          globalState.update(configKey('lastUseHost'), registry.host);
+          hostSnippetsProvider.openLastest();
+          mySnippetsProvider.openLastest();
+        }
+      },
+    ],
+    [
+      'publish',
+      async () => {
+        const res = await publish(globalState);
+        mySnippetsProvider.reload(res?.registry?.host);
+      },
+    ],
+    ['reloadMySnippets', (host: Host) => mySnippetsProvider.reload(host)],
+    [
+      'reloadExploreSnippets',
+      (host: Host) => hostSnippetsProvider.reload(host),
+    ],
+    [
+      'star',
+      (snippet: Snippet) => {
+        starSnippet(globalState, snippet);
+        staredProvider.reload();
+      },
+    ],
+    [
+      'starById',
+      async () => {
+        await starById(globalState);
+        staredProvider.reload();
+      },
+    ],
+    [
+      'unstar',
+      (snippet: StaredSnippet) => {
+        unstarSnippet(globalState, snippet);
+        staredProvider.reload();
+      },
+    ],
+    [
+      'download',
+      (snippet: StaredSnippet | Snippet) =>
+        downloadSnippet(globalState, snippet),
+    ],
+    ['viewSnippet', viewSnippet],
+    ['exploreMore', () => hostSnippetsProvider.loadMore()],
+  ].forEach(([cmd, callback]) =>
+    subscriptions.push(
       commands.registerCommand(
         commandName(cmd as Command),
         callback as () => void

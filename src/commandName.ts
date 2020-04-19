@@ -7,7 +7,6 @@ export type Command =
   | 'star'
   | 'unstar'
   | 'viewSnippet'
-  | 'toggleHost'
   | 'exploreMore';
 
 export default function commandName(shorthand: Command) {

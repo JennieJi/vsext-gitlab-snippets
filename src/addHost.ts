@@ -9,6 +9,12 @@ export default async function addHost(state: Memento, defaultValue?: string) {
     ignoreFocusOut: true,
     prompt: 'Enter your gitlab host',
     value: defaultValue || PROTOCOL,
+    validateInput(value) {
+      if (value && value.replace(PROTOCOL, '').trim()) {
+        return null;
+      }
+      return 'Must enter a valid host';
+    },
   });
   if (!host) {
     return;
@@ -19,6 +25,11 @@ export default async function addHost(state: Memento, defaultValue?: string) {
   const token = await window.showInputBox({
     ignoreFocusOut: true,
     prompt: 'Enter your gitlab token',
+    validateInput(value) {
+      if (!value || !value.trim()) {
+        return 'Personal token is required!';
+      }
+    },
   });
   if (!token) {
     return;
@@ -28,13 +39,10 @@ export default async function addHost(state: Memento, defaultValue?: string) {
     placeHolder: 'Choose host API version',
     ignoreFocusOut: true,
   });
-  if (!version) {
-    return;
-  }
   const registry = {
     host,
     token,
-    version: parseInt(version, 10),
+    version: (version && parseInt(version, 10)) || 4,
   };
   const api = new SnippetRegistry(registry);
   const snippets = await api.getSnippets();

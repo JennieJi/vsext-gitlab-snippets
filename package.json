@@ -65,10 +65,6 @@
         "title": "View"
       },
       {
-        "command": "gitlabSnippets.toggleHost",
-        "title": "Expand/Collapse"
-      },
-      {
         "command": "gitlabSnippets.exploreMore",
         "title": "More"
       },
@@ -86,13 +82,30 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "gitlabSnippets.publish"
+          "command": "gitlabSnippets.publish",
+          "when": "editorFocus"
         },
         {
           "command": "gitlabSnippets.addHost"
         },
         {
+          "command": "gitlabSnippets.star",
+          "when": "false"
+        },
+        {
           "command": "gitlabSnippets.starById"
+        },
+        {
+          "command": "gitlabSnippets.unstar",
+          "when": "false"
+        },
+        {
+          "command": "gitlabSnippets.download",
+          "when": "false"
+        },
+        {
+          "command": "gitlabSnippets.viewSnippet",
+          "when": "false"
         }
       ],
       "view/item/context": [

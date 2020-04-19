@@ -1,6 +1,5 @@
 import { Host } from '../types';
 import { TreeItem, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
-import commandName from '../commandName';
 
 export default function getHostItem(
   { host }: Host,
@@ -14,9 +13,5 @@ export default function getHostItem(
       ? TreeItemCollapsibleState.Expanded
       : TreeItemCollapsibleState.Collapsed,
     iconPath: ThemeIcon.Folder,
-    command: {
-      command: commandName('toggleHost'),
-      title: 'Expand/collapse host list',
-    },
   };
 }
