@@ -70,6 +70,9 @@ export default async function publish(state: Memento) {
     content,
   };
   await api?.publish(snippet);
+  window.showInformationMessage(
+    `Successfully published "${fileName || title}" to ${api?.host.host}!`
+  );
   return {
     snippet,
     registry: api,
