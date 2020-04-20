@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { window, Memento } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
 import addHost from './addHost';
@@ -31,10 +32,11 @@ export default async function publish(state: Memento) {
     }
     api = new SnippetRegistry(hostConfig);
   }
+  const activeEditorPath = activeTextEditor.document.fileName;
   const fileName = await window.showInputBox({
     ignoreFocusOut: true,
     prompt: 'Enter file name with extention. E.g., "example.js".',
-    value: activeTextEditor.document.fileName,
+    value: activeEditorPath ? path.basename(activeEditorPath) : undefined,
   });
   if (!fileName) {
     return;
