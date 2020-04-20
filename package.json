@@ -2,7 +2,7 @@
   "name": "gitlab-snippets",
   "displayName": "Gitlab Snippets",
   "description": "Use gilab snippets easily",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "jyee721",
   "icon": "resources/icons/gitlab-logo.png",
   "author": {
@@ -88,8 +88,7 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "gitlabSnippets.publish",
-          "when": "editorFocus"
+          "command": "gitlabSnippets.publish"
         },
         {
           "command": "gitlabSnippets.addHost"
