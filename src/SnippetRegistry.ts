@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { Host, Snippet, NewSnippet } from './types';
-import { URLSearchParams } from 'url';
+import { URLSearchParams, URL } from 'url';
+import { window } from 'vscode';
 
 class SnippetRegistry {
   public host: Host;
@@ -16,7 +17,8 @@ class SnippetRegistry {
 
   private endpoint(name: string) {
     const { host, version } = this.host;
-    return `${host}/api/v${version}/${name}`;
+    const ret = new URL(`/api/v${version}/${name}`, host);
+    return ret;
   }
 
   private get(endpoint: string) {
@@ -33,10 +35,14 @@ class SnippetRegistry {
   }
 
   public getSnippets(page?: number, perPage?: number): Promise<Snippet[]> {
-    const search = new URLSearchParams({
-      page: page ? page.toString() : undefined,
-      per_page: perPage ? perPage.toString() : undefined,
-    });
+    const params = {} as { [key: string]: string };
+    if (page) {
+      params.page = page.toString();
+    }
+    if (perPage) {
+      params.perPage = perPage.toString();
+    }
+    const search = new URLSearchParams(params);
     return this.get('snippets/public?' + search.toString()).then((res) =>
       res.json()
     );
