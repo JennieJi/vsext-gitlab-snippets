@@ -46,6 +46,11 @@
         "title": "Add gitlab host"
       },
       {
+        "command": "gitlabSnippets.removeHost",
+        "category": "Gitlab Snippets",
+        "title": "Remove gitlab host"
+      },
+      {
         "command": "gitlabSnippets.star",
         "title": "Star",
         "icon": "$(star-empty)"
@@ -92,6 +97,9 @@
         },
         {
           "command": "gitlabSnippets.addHost"
+        },
+        {
+          "command": "gitlabSnippets.removeHost"
         },
         {
           "command": "gitlabSnippets.star",
