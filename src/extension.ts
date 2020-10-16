@@ -13,6 +13,7 @@ import starById from './starById';
 import viewSnippet from './viewSnippet';
 import { Snippet, StaredSnippet, Host } from './types';
 import downloadSnippet from './downloadSnippet';
+import { removeHostSelector, removeHost } from './removeHost';
 
 let views = [] as TreeView<any>[];
 
@@ -31,6 +32,28 @@ export function activate(context: ExtensionContext) {
   views = [staredView, hostsView, myView];
 
   [
+    [
+      'removeHostSelector',
+      () =>
+        removeHostSelector(globalState).then((host) => {
+          if (globalState.get(configKey('lastUseHost')) === host) {
+            globalState.update(configKey('lastUseHost'), '');
+          }
+          hostSnippetsProvider.reload();
+          mySnippetsProvider.reload();
+        }),
+    ],
+    [
+      'removeHost',
+      (host: Host) =>
+        removeHost(globalState, host.host).then((host) => {
+          if (globalState.get(configKey('lastUseHost')) === host) {
+            globalState.update(configKey('lastUseHost'), '');
+          }
+          hostSnippetsProvider.reload();
+          mySnippetsProvider.reload();
+        }),
+    ],
     [
       'addHost',
       async () => {

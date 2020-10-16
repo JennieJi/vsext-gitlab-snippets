@@ -20,8 +20,7 @@ export default function listManager<T>(
       ...existing.filter((item) => getId(item) !== id),
     ]);
   };
-  const remove = (item: T) => {
-    const id = getId(item);
+  const remove = (id: string) => {
     return state.update(
       key,
       get().filter((item) => getId(item) !== id)

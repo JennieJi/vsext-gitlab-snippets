@@ -20,5 +20,5 @@ export function starSnippet(state: Memento, snippet: Snippet) {
 }
 
 export function unstarSnippet(state: Memento, snippet: StaredSnippet) {
-  return starManager(state).remove(snippet);
+  return starManager(state).remove(snippet.raw_url);
 }
