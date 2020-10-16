@@ -9,6 +9,9 @@
     "name": "Jennie Ji",
     "email": "jennie.ji@hotmail.com"
   },
+  "contributors": [
+    "Jure <jure@kreativc.si>"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/JennieJi/vsext-gitlab-snippets"
@@ -44,6 +47,11 @@
         "command": "gitlabSnippets.addHost",
         "category": "Gitlab Snippets",
         "title": "Add gitlab host"
+      },
+      {
+        "command": "gitlabSnippets.removeHostSelector",
+        "category": "Gitlab Snippets",
+        "title": "Remove gitlab host"
       },
       {
         "command": "gitlabSnippets.removeHost",
@@ -99,7 +107,7 @@
           "command": "gitlabSnippets.addHost"
         },
         {
-          "command": "gitlabSnippets.removeHost"
+          "command": "gitlabSnippets.removeHostSelector"
         },
         {
           "command": "gitlabSnippets.star",
@@ -122,6 +130,10 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "gitlabSnippets.removeHost",
+          "when": "view == gitlabSnippetsExplorer-all && viewItem == host"
+        },
         {
           "command": "gitlabSnippets.reloadMySnippets",
           "when": "view == gitlabSnippetsExplorer-mine && viewItem == host",
