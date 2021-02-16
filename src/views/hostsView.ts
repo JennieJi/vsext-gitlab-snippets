@@ -6,13 +6,13 @@ import {
   Memento,
   window,
   ThemeIcon,
-} from 'vscode';
-import { Host, Snippet } from '../types';
-import getSnippetItem from './getSnippetItem';
-import getHostItem from './getHostItem';
-import SnippetRegistry from '../SnippetRegistry';
-import hostManager from '../hostManager';
-import commandName from '../commandName';
+} from "vscode";
+import { Host, Snippet } from "../types";
+import getSnippetItem from "./getSnippetItem";
+import getHostItem from "./getHostItem";
+import SnippetRegistry from "../SnippetRegistry";
+import hostManager from "../hostManager";
+import commandName from "../commandName";
 
 const PER_PAGE = 20;
 
@@ -25,7 +25,7 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
 
   private _activeHost: string | undefined;
   get activeHost() {
-    return this._activeHost || '';
+    return this._activeHost || "";
   }
   set activeHost(val: string) {
     this._activeHost = val;
@@ -43,12 +43,12 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
 
   private getLoadMoreItem(): TreeItem {
     return {
-      label: 'Load more ...',
+      label: "Load more ...",
       id: `${this.activeHost}-loadmore`,
-      iconPath: new ThemeIcon('chevron-down'),
+      iconPath: new ThemeIcon("chevron-down"),
       command: {
-        command: commandName('exploreMore'),
-        title: 'More',
+        command: commandName("exploreMore"),
+        title: "More",
       },
     };
   }
@@ -91,7 +91,7 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
       return getHostItem(el as Host, this.activeHost === (el as Host).host);
     }
     if ((el as Snippet).id) {
-      return getSnippetItem('host-', el as Snippet);
+      return getSnippetItem(this.state, "host-", el as Snippet);
     }
     return this.getLoadMoreItem();
   }
@@ -100,7 +100,7 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
 export default function registerView(state: Memento) {
   const dataProvider = new SnippetsProvider(state);
   return {
-    view: window.createTreeView('gitlabSnippetsExplorer-all', {
+    view: window.createTreeView("gitlabSnippetsExplorer-all", {
       treeDataProvider: dataProvider,
     }),
     dataProvider,

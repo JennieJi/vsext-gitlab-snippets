@@ -1,8 +1,9 @@
-import { ThemeIcon, TreeItem } from 'vscode';
-import { Snippet } from '../types';
-import commandName from '../commandName';
+import { Memento, ThemeIcon, TreeItem } from "vscode";
+import { Snippet } from "../types";
+import commandName from "../commandName";
 
 export default function getSnippetItem(
+  state: Memento,
   prefix: string,
   snippet: Snippet
 ): TreeItem {
@@ -10,12 +11,12 @@ export default function getSnippetItem(
   return {
     label,
     id: prefix + id,
-    contextValue: 'snippet',
+    contextValue: "snippet",
     description: `${fileName} - ${author.name}`,
-    iconPath: new ThemeIcon('code'),
+    iconPath: new ThemeIcon("code"),
     command: {
-      command: commandName('viewSnippet'),
-      arguments: [snippet],
+      command: commandName("viewSnippet"),
+      arguments: [state, snippet],
       title: `Preview snippet`,
     },
   };
