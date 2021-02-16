@@ -28,15 +28,12 @@ fetch(
   });
 
 export default async function viewSnippet(state: Memento, snippet: Snippet) {
-  const banner = `/* ${snippet.file_name || snippet.title} - ${
-    snippet.web_url
-  }  */\n`;
   const content = await new SnippetItem(state, snippet).getContent();
   const fileExt = snippet.file_name?.match(/\.\w+$/)?.[0];
   const language = fileExt && langMap[fileExt]?.ace_mode;
   workspace
     .openTextDocument({
-      content: banner + content,
+      content,
       language,
     })
     .then(window.showTextDocument);
