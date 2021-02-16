@@ -1,8 +1,8 @@
-import fetch from 'node-fetch';
-import { Host, Snippet, NewSnippet } from './types';
-import { URLSearchParams, URL } from 'url';
-import { window } from 'vscode';
-
+import fetch from "node-fetch";
+import { Memento, window } from "vscode";
+import { Host, Snippet, NewSnippet, StaredSnippet } from "./types";
+import { URLSearchParams, URL } from "url";
+import hostManager from "./hostManager";
 class SnippetRegistry {
   public host: Host;
   private headers: { [key: string]: string };
@@ -10,8 +10,8 @@ class SnippetRegistry {
   constructor(host: Host) {
     this.host = host;
     this.headers = {
-      'PRIVATE-TOKEN': host.token,
-      'Content-Type': 'application/json',
+      "PRIVATE-TOKEN": host.token,
+      "Content-Type": "application/json",
     };
   }
 
@@ -28,7 +28,7 @@ class SnippetRegistry {
   }
   private post(endpoint: string, body: { [key: string]: any }) {
     return fetch(this.endpoint(endpoint), {
-      method: 'POST',
+      method: "POST",
       headers: this.headers,
       body: JSON.stringify(body),
     });
@@ -43,13 +43,13 @@ class SnippetRegistry {
       params.perPage = perPage.toString();
     }
     const search = new URLSearchParams(params);
-    return this.get('snippets/public?' + search.toString()).then((res) =>
+    return this.get("snippets/public?" + search.toString()).then((res) =>
       res.json()
     );
   }
 
   public getUserSnippets(): Promise<Snippet[]> {
-    return this.get('snippets').then((res) => res.json());
+    return this.get("snippets").then((res) => res.json());
   }
 
   public getSnippet(id: number): Promise<Snippet> {
@@ -61,7 +61,32 @@ class SnippetRegistry {
   }
 
   public publish(data: NewSnippet) {
-    return this.post('snippets', data);
+    return this.post("snippets", data);
   }
 }
 export default SnippetRegistry;
+
+export class SnippetItem {
+  registry?: SnippetRegistry;
+  snippet: Snippet;
+
+  constructor(state: Memento, snippet: Snippet) {
+    this.snippet = snippet;
+    const host =
+      (snippet as StaredSnippet).host ||
+      snippet.raw_url.replace(/^(\w+:\/\/)?([\w-\.]+)\/.*/, "$1$2");
+    let hostConfig = hostManager(state).getById(host);
+    if (!hostConfig) {
+      window.showErrorMessage(
+        `Lack of token for ${host}! Please add token and try again.`
+      );
+      return;
+    }
+    this.registry = new SnippetRegistry(hostConfig);
+  }
+  public getContent(): Promise<string> {
+    return (
+      this.registry?.getSnippetContent(this.snippet.id) || Promise.reject()
+    );
+  }
+}

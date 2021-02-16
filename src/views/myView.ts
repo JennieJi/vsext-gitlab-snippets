@@ -5,12 +5,12 @@ import {
   Event,
   Memento,
   window,
-} from 'vscode';
-import { Host, Snippet } from '../types';
-import getSnippetItem from './getSnippetItem';
-import getHostItem from './getHostItem';
-import SnippetRegistry from '../SnippetRegistry';
-import hostManager from '../hostManager';
+} from "vscode";
+import { Host, Snippet } from "../types";
+import getSnippetItem from "./getSnippetItem";
+import getHostItem from "./getHostItem";
+import SnippetRegistry from "../SnippetRegistry";
+import hostManager from "../hostManager";
 
 export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -20,7 +20,7 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
 
   private _activeHost: string | undefined;
   get activeHost() {
-    return this._activeHost || '';
+    return this._activeHost || "";
   }
   set activeHost(val: string) {
     this._activeHost = val;
@@ -62,14 +62,14 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
     if ((el as Host).host) {
       return getHostItem(el as Host, this.activeHost === (el as Host).host);
     }
-    return getSnippetItem('host-', el as Snippet);
+    return getSnippetItem(this.state, "host-", el as Snippet);
   }
 }
 
 export default function registerView(state: Memento) {
   const dataProvider = new SnippetsProvider(state);
   return {
-    view: window.createTreeView('gitlabSnippetsExplorer-mine', {
+    view: window.createTreeView("gitlabSnippetsExplorer-mine", {
       treeDataProvider: dataProvider,
     }),
     dataProvider,

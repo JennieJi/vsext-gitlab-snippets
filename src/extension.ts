@@ -1,19 +1,20 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, window, TreeView } from 'vscode';
-import commandName, { Command } from './commandName';
-import addHost from './addHost';
-import publish from './publishSnippet';
-import configKey from './configKey';
-import registerStaredView from './views/staredView';
-import registerHostsView from './views/hostsView';
-import registerMyView from './views/myView';
-import { starSnippet, unstarSnippet } from './starManager';
-import starById from './starById';
-import viewSnippet from './viewSnippet';
-import { Snippet, StaredSnippet, Host } from './types';
-import downloadSnippet from './downloadSnippet';
-import { removeHostSelector, removeHost } from './removeHost';
+import { ExtensionContext, commands, TreeView } from "vscode";
+import commandName, { Command } from "./commandName";
+import addHost from "./addHost";
+import publish from "./publishSnippet";
+import configKey from "./configKey";
+import registerStaredView from "./views/staredView";
+import registerHostsView from "./views/hostsView";
+import registerMyView from "./views/myView";
+import { starSnippet, unstarSnippet } from "./starManager";
+import starById from "./starById";
+import viewSnippet from "./viewSnippet";
+import viewSnippetInBrowser from "./viewSnippetInBrowser";
+import { Snippet, StaredSnippet, Host } from "./types";
+import downloadSnippet from "./downloadSnippet";
+import { removeHostSelector, removeHost } from "./removeHost";
 
 let views = [] as TreeView<any>[];
 
@@ -33,78 +34,79 @@ export function activate(context: ExtensionContext) {
 
   [
     [
-      'removeHostSelector',
+      "removeHostSelector",
       () =>
         removeHostSelector(globalState).then((host) => {
-          if (globalState.get(configKey('lastUseHost')) === host) {
-            globalState.update(configKey('lastUseHost'), '');
+          if (globalState.get(configKey("lastUseHost")) === host) {
+            globalState.update(configKey("lastUseHost"), "");
           }
           hostSnippetsProvider.reload();
           mySnippetsProvider.reload();
         }),
     ],
     [
-      'removeHost',
+      "removeHost",
       (host: Host) =>
         removeHost(globalState, host.host).then((host) => {
-          if (globalState.get(configKey('lastUseHost')) === host) {
-            globalState.update(configKey('lastUseHost'), '');
+          if (globalState.get(configKey("lastUseHost")) === host) {
+            globalState.update(configKey("lastUseHost"), "");
           }
           hostSnippetsProvider.reload();
           mySnippetsProvider.reload();
         }),
     ],
     [
-      'addHost',
+      "addHost",
       async () => {
         const { registry } = (await addHost(globalState)) || {};
         if (registry) {
-          globalState.update(configKey('lastUseHost'), registry.host);
+          globalState.update(configKey("lastUseHost"), registry.host);
           hostSnippetsProvider.openLastest();
           mySnippetsProvider.openLastest();
         }
       },
     ],
     [
-      'publish',
+      "publish",
       async () => {
         const res = await publish(globalState);
         mySnippetsProvider.reload(res?.registry?.host);
       },
     ],
-    ['reloadMySnippets', (host: Host) => mySnippetsProvider.reload(host)],
+    ["reloadMySnippets", (host: Host) => mySnippetsProvider.reload(host)],
     [
-      'reloadExploreSnippets',
+      "reloadExploreSnippets",
       (host: Host) => hostSnippetsProvider.reload(host),
     ],
     [
-      'star',
+      "star",
       (snippet: Snippet) => {
         starSnippet(globalState, snippet);
         staredProvider.reload();
       },
     ],
     [
-      'starById',
+      "starById",
       async () => {
         await starById(globalState);
         staredProvider.reload();
       },
     ],
     [
-      'unstar',
+      "unstar",
       (snippet: StaredSnippet) => {
         unstarSnippet(globalState, snippet);
         staredProvider.reload();
       },
     ],
     [
-      'download',
+      "download",
       (snippet: StaredSnippet | Snippet) =>
         downloadSnippet(globalState, snippet),
     ],
-    ['viewSnippet', viewSnippet],
-    ['exploreMore', () => hostSnippetsProvider.loadMore()],
+    ["viewSnippet", viewSnippet],
+    ["viewSnippetInBrowser", viewSnippetInBrowser],
+    ["exploreMore", () => hostSnippetsProvider.loadMore()],
   ].forEach(([cmd, callback]) =>
     subscriptions.push(
       commands.registerCommand(
