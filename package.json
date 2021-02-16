@@ -116,6 +116,10 @@
           "command": "gitlabSnippets.removeHostSelector"
         },
         {
+          "command": "gitlabSnippets.removeHost",
+          "when": "false"
+        },
+        {
           "command": "gitlabSnippets.star",
           "when": "false"
         },
@@ -142,7 +146,7 @@
       "view/item/context": [
         {
           "command": "gitlabSnippets.removeHost",
-          "when": "view == gitlabSnippetsExplorer-all && viewItem == host"
+          "when": "viewItem == host"
         },
         {
           "command": "gitlabSnippets.reloadMySnippets",
