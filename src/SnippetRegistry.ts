@@ -18,7 +18,7 @@ class SnippetRegistry {
   private endpoint(name: string) {
     const { host, version } = this.host;
     const ret = new URL(`/api/v${version}/${name}`, host);
-    return ret;
+    return ret.toString();
   }
 
   private get(endpoint: string) {
@@ -44,16 +44,16 @@ class SnippetRegistry {
     }
     const search = new URLSearchParams(params);
     return this.get("snippets/public?" + search.toString()).then((res) =>
-      res.json()
+      res.json() as Promise<Snippet[]>
     );
   }
 
   public getUserSnippets(): Promise<Snippet[]> {
-    return this.get("snippets").then((res) => res.json());
+    return this.get("snippets").then((res) => res.json() as Promise<Snippet[]>);
   }
 
   public getSnippet(id: number): Promise<Snippet> {
-    return this.get(`snippets/${id}`).then((res) => res.json());
+    return this.get(`snippets/${id}`).then((res) => res.json() as Promise<Snippet>);
   }
 
   public getSnippetContent(id: number): Promise<string> {
