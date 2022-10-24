@@ -1,5 +1,4 @@
 import { Memento, window } from 'vscode';
-import hostManager from './hostManager';
 import SnippetRegistry from './SnippetRegistry';
 import { starManager } from './starManager';
 import chooseHost from './chooseHost';

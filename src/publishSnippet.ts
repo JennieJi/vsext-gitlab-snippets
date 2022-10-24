@@ -2,7 +2,6 @@ import * as path from 'path';
 import { window, Memento } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
 import addHost from './addHost';
-import { Host } from './types';
 import { VISIBILITY } from './constants';
 import hostManager from './hostManager';
 import chooseHost from './chooseHost';

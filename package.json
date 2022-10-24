@@ -2,7 +2,7 @@
   "name": "gitlab-snippets",
   "displayName": "Gitlab Snippets",
   "description": "Use gilab snippets easily",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "jyee721",
   "icon": "resources/icons/gitlab-logo.png",
   "author": {
@@ -215,13 +215,16 @@
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
-    "compile": "tsc -p ./",
+    "compile": "rollup -c",
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^9.0.2",
     "@types/glob": "^7.1.1",
     "@types/js-yaml": "^4.0.0",
     "@types/mocha": "^7.0.1",
@@ -233,6 +236,7 @@
     "eslint": "^6.8.0",
     "glob": "^7.1.6",
     "mocha": "^7.0.1",
+    "rollup": "^3.2.3",
     "typescript": "^3.7.5",
     "vscode-test": "^1.3.0"
   },
