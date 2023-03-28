@@ -58,7 +58,7 @@
         "command": "gitlabSnippets.removeHost",
         "category": "Gitlab Snippets",
         "title": "Remove gitlab host",
-        "icon": "$(remove)"
+        "icon": "$(notebook-delete-cell)"
       },
       {
         "command": "gitlabSnippets.star",
@@ -147,7 +147,8 @@
       "view/item/context": [
         {
           "command": "gitlabSnippets.removeHost",
-          "when": "viewItem == host"
+          "when": "viewItem == host",
+          "group": "inline"
         },
         {
           "command": "gitlabSnippets.reloadMySnippets",
