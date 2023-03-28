@@ -6,13 +6,13 @@ import {
   Memento,
   window,
 } from "vscode";
-import { Host, Snippet } from "../types";
+import { Host, Snippet, SnippetFileExtended } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
 import SnippetRegistry from "../SnippetRegistry";
 import hostManager from "../hostManager";
 
-export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
+export class SnippetsProvider implements TreeDataProvider<Host | Snippet | SnippetFileExtended> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
@@ -51,18 +51,28 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
     this.reload();
   }
 
-  public getChildren(el?: Host): Thenable<Host[] | Snippet[]> {
+  public async getChildren(el?: Host | Snippet): Promise<Host[] | Snippet[] | SnippetFileExtended[]> {
     if (!el) {
-      return Promise.resolve(this.getHosts());
+      return this.getHosts();
     }
-    return this.getSnippets(el);
+    if ((el as Host).host) {
+      return this.getSnippets(el as Host);
+    }
+    return (el as Snippet).files.map(f => ({
+      ...f,
+      snippet: el
+    } as SnippetFileExtended));
   }
 
-  public getTreeItem(el: Host | Snippet): TreeItem {
+  public getTreeItem(el: Host | Snippet | SnippetFileExtended): TreeItem {
     if ((el as Host).host) {
       return getHostItem(el as Host, this.activeHost === (el as Host).host);
     }
-    return getSnippetItem(this.state, "host-", el as Snippet);
+    if ((el as SnippetFileExtended).path) {
+      const { path, snippet } = el as SnippetFileExtended;
+      return getSnippetItem(this.state, "mine-", snippet, path);
+    }
+    return getSnippetItem(this.state, "mine-", el as Snippet);
   }
 }
 

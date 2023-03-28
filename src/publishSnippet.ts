@@ -56,7 +56,7 @@ export default async function publish(state: Memento) {
     (await window.showInputBox({
       ignoreFocusOut: true,
       prompt: '[Optional]Enter a brief description',
-    })) || null;
+    })) || '';
   const visibility =
     (await window.showQuickPick(Object.values(VISIBILITY), {
       canPickMany: false,

@@ -46,7 +46,8 @@
       {
         "command": "gitlabSnippets.addHost",
         "category": "Gitlab Snippets",
-        "title": "Add gitlab host"
+        "title": "Add gitlab host",
+        "icon": "$(search-expand-results)"
       },
       {
         "command": "gitlabSnippets.removeHostSelector",
@@ -160,29 +161,29 @@
         },
         {
           "command": "gitlabSnippets.viewSnippetInBrowser",
-          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem == snippet",
+          "when": "view =~ /^gitlabSnippetsExplorer/ && viewItem =~ /^snippet(Repo)?$/",
           "group": "inline"
         },
         {
           "command": "gitlabSnippets.download",
-          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem == snippet",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/",
           "group": "inline"
         },
         {
           "command": "gitlabSnippets.star",
-          "when": "view =~ /gitlabSnippetsExplorer-(all|mine)/ && viewItem == snippet",
+          "when": "view =~ /gitlabSnippetsExplorer-(all|mine)/ && viewItem =~ /^snippet(Repo)?$/",
           "group": "inline"
         },
         {
           "command": "gitlabSnippets.unstar",
-          "when": "view == gitlabSnippetsExplorer-stared && viewItem == snippet",
+          "when": "view == gitlabSnippetsExplorer-stared && viewItem =~ /^snippet(Repo)?$/",
           "group": "inline"
         }
       ],
       "view/title": [
         {
-          "command": "gitlabSnippets.starById",
-          "when": "view == gitlabSnippetsExplorer-stared",
+          "command": "gitlabSnippets.addHost",
+          "when": "view =~ /^gitlabSnippetsExplorer-(mine|all)$/",
           "group": "navigation"
         }
       ]

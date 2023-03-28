@@ -13,7 +13,7 @@ export interface Snippet {
   id: number;
   title: string;
   file_name: string;
-  description: string | null;
+  description: string;
   visibility: string;
   author: Author;
   updated_at: string;
@@ -21,7 +21,16 @@ export interface Snippet {
   project_id: string | null;
   web_url: string;
   raw_url: string;
+  files: SnippetFile[];
 }
+export interface SnippetFile {
+  path: string;
+  raw_url: string;
+}
+export interface SnippetFileExtended extends SnippetFile {
+  snippet: Snippet
+}
+
 export type NewSnippet = Pick<
   Snippet,
   'title' | 'file_name' | 'description' | 'visibility'

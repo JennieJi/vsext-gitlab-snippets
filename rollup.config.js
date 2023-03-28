@@ -10,7 +10,8 @@ module.exports = {
   output: {
     dir: 'out',
     format: 'cjs',
-    sourcemap: true
+    sourcemap: true,
+    chunkFileNames: '[name].js',
   },
   plugins: [typescript(), commonjs(), resolve()]
 };
