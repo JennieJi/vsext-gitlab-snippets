@@ -2,11 +2,11 @@ import { window, Memento } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
 import hostManager from './hostManager';
 
-export default async function addHost(state: Memento, defaultValue?: string) {
+export default async function addHost(state: Memento) {
   let host = await window.showInputBox({
     ignoreFocusOut: true,
     prompt: 'Enter your gitlab host',
-    value: defaultValue || 'https://',
+    value: 'https://gitlab.com',
     validateInput(value) {
       if (!/https?:\/\//.test(value)) {
         return 'Must start with "http://" or "https://" protocal';

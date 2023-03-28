@@ -38,7 +38,16 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
   }
 
   private getHosts() {
-    return hostManager(this.state).get();
+    const storedHosts = hostManager(this.state).get();
+    if (storedHosts.find(h => h.host === 'https://gitlab.com' || h.host === 'https://www.gitlab.com/')) {
+      return storedHosts;
+    }
+    return [...storedHosts,
+    {
+      host: 'https://gitlab.com',
+      token: 'glpat-vuVzP8sbzKZHBYRcXmyB',
+      version: 4,
+    }];
   }
 
   private getLoadMoreItem(): TreeItem {
