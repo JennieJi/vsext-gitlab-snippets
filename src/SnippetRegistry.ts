@@ -56,8 +56,9 @@ class SnippetRegistry {
     return this.get(`snippets/${id}`).then((res) => res.json() as Promise<Snippet>);
   }
 
-  public getSnippetContent(id: number): Promise<string> {
-    return this.get(`snippets/${id}/raw`).then((res) => res.text());
+  public getSnippetContent(id: number, path?: string): Promise<string> {
+    const url = path ? `snippets/${id}/files/main/${path}/raw` : `snippets/${id}/raw`;
+    return this.get(url).then((res) => res.text());
   }
 
   public publish(data: NewSnippet) {
@@ -84,9 +85,9 @@ export class SnippetItem {
     }
     this.registry = new SnippetRegistry(hostConfig);
   }
-  public getContent(): Promise<string> {
+  public getContent(path?: string): Promise<string> {
     return (
-      this.registry?.getSnippetContent(this.snippet.id) || Promise.reject()
+      this.registry?.getSnippetContent(this.snippet.id, path) || Promise.reject()
     );
   }
 }

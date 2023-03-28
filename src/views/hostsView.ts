@@ -7,7 +7,7 @@ import {
   window,
   ThemeIcon,
 } from "vscode";
-import { Host, Snippet } from "../types";
+import { Host, Snippet, SnippetFileExtended } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
 import SnippetRegistry from "../SnippetRegistry";
@@ -16,7 +16,7 @@ import commandName from "../commandName";
 
 const PER_PAGE = 20;
 
-export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
+export class SnippetsProvider implements TreeDataProvider<Host | Snippet | SnippetFileExtended> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
@@ -38,7 +38,16 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
   }
 
   private getHosts() {
-    return hostManager(this.state).get();
+    const storedHosts = hostManager(this.state).get();
+    if (storedHosts.find(h => h.host === 'https://gitlab.com' || h.host === 'https://www.gitlab.com/')) {
+      return storedHosts;
+    }
+    return [...storedHosts,
+    {
+      host: 'https://gitlab.com',
+      token: 'glpat-vuVzP8sbzKZHBYRcXmyB',
+      version: 4,
+    }];
   }
 
   private getLoadMoreItem(): TreeItem {
@@ -74,21 +83,30 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet> {
     this._onDidChangeTreeData.fire();
   }
 
-  public getChildren(el?: Host): Thenable<Host[] | Snippet[]> {
+  public async getChildren(el?: Host | Snippet): Promise<Host[] | Snippet[] | SnippetFileExtended[]> {
     if (!el) {
-      return Promise.resolve(this.getHosts());
-    } else {
-      return this.getSnippets(el).then((snippets) =>
+      return this.getHosts();
+    }
+    if ((el as Host).host) {
+      return this.getSnippets(el as Host).then((snippets) =>
         snippets.length === this.activeLimit
           ? [...snippets, {} as Snippet]
           : snippets
       );
     }
+    return (el as Snippet).files.map(f => ({
+      ...f,
+      snippet: el
+    } as SnippetFileExtended));
   }
 
-  public getTreeItem(el: Host | Snippet): TreeItem {
+  public getTreeItem(el: Host | Snippet | SnippetFileExtended): TreeItem {
     if ((el as Host).host) {
       return getHostItem(el as Host, this.activeHost === (el as Host).host);
+    }
+    if ((el as SnippetFileExtended).path) {
+      const { path, snippet } = el as SnippetFileExtended;
+      return getSnippetItem(this.state, "host-", snippet, path);
     }
     if ((el as Snippet).id) {
       return getSnippetItem(this.state, "host-", el as Snippet);

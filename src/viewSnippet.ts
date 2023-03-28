@@ -1,5 +1,5 @@
 import { window, Memento, workspace } from "vscode";
-import { Snippet } from "./types";
+import { Snippet, SnippetFileExtended } from "./types";
 import { SnippetItem } from "./SnippetRegistry";
 import fetch from "node-fetch";
 import * as yaml from "js-yaml";
@@ -27,9 +27,9 @@ fetch(
     }
   });
 
-export default async function viewSnippet(state: Memento, snippet: Snippet) {
-  const content = await new SnippetItem(state, snippet).getContent();
-  const fileExt = snippet.file_name?.match(/\.\w+$/)?.[0];
+export default async function viewSnippet(state: Memento, snippet: Snippet, path?: string) {
+  const content = await new SnippetItem(state, snippet).getContent(path);
+  const fileExt = (path ?? snippet.file_name)?.match(/\.\w+$/)?.[0];
   const language = fileExt && langMap[fileExt]?.ace_mode;
   workspace
     .openTextDocument({
