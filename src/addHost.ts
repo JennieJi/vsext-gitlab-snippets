@@ -5,7 +5,7 @@ import hostManager from './hostManager';
 export default async function addHost(state: Memento) {
   let host = await window.showInputBox({
     ignoreFocusOut: true,
-    prompt: 'Enter your gitlab host',
+    prompt: 'Enter your Gitlab host',
     value: 'https://gitlab.com',
     validateInput(value) {
       if (!/https?:\/\//.test(value)) {
@@ -19,7 +19,7 @@ export default async function addHost(state: Memento) {
   }
   const token = await window.showInputBox({
     ignoreFocusOut: true,
-    prompt: 'Enter your gitlab token',
+    prompt: 'Enter your Gitlab token',
     validateInput(value) {
       if (!value || !value.trim()) {
         return 'Personal token is required!';
