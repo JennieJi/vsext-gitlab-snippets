@@ -9,12 +9,12 @@ import chooseHost from './chooseHost';
 export default async function publish(state: Memento) {
   const { activeTextEditor } = window;
   if (!activeTextEditor) {
-    window.showErrorMessage('Please open the file first!');
+    window.showErrorMessage('Please open a file first!');
     return;
   }
   const content = activeTextEditor.document.getText();
   if (!content) {
-    window.showErrorMessage('Could not publish an empty file!');
+    window.showErrorMessage('Publishing an empty file is not a good idea!');
     return;
   }
 
@@ -34,7 +34,7 @@ export default async function publish(state: Memento) {
   const activeEditorPath = activeTextEditor.document.fileName;
   const fileName = await window.showInputBox({
     ignoreFocusOut: true,
-    prompt: 'Enter file name with extention. E.g., "example.js".',
+    prompt: 'Enter a file name with extension. E.g., "example.js".',
     value: activeEditorPath ? path.basename(activeEditorPath) : undefined,
   });
   if (!fileName) {
