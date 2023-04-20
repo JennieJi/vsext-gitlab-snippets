@@ -31,6 +31,18 @@ export default async function publish(state: Memento) {
     }
     api = new SnippetRegistry(hostConfig);
   }
+  const projects = await api?.getUserProjects() || [];
+  const project = await window.showQuickPick(
+    projects.map((project) => ({
+      label: project.name,
+      description: project.name,
+      details: project.path_with_namespace
+    })),
+    {
+      canPickMany: false,
+      placeHolder: 'Are you publishing into a project? If so, choose one below.',
+    }
+  );
   const activeEditorPath = activeTextEditor.document.fileName;
   const fileName = await window.showInputBox({
     ignoreFocusOut: true,
@@ -70,7 +82,7 @@ export default async function publish(state: Memento) {
     visibility,
     content,
   };
-  await api?.publish(snippet);
+  await api?.publish(snippet, project && encodeURIComponent(project.details));
   window.showInformationMessage(
     `Successfully published "${fileName || title}" to ${api?.host.host}!`
   );

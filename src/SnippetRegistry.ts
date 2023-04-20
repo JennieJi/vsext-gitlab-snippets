@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { Memento, window } from "vscode";
-import { Host, Snippet, NewSnippet, StaredSnippet } from "./types";
+import { Host, Snippet, NewSnippet, StaredSnippet, Project } from "./types";
 import { URLSearchParams, URL } from "url";
 import hostManager from "./hostManager";
 class SnippetRegistry {
@@ -21,10 +21,20 @@ class SnippetRegistry {
     return ret.toString();
   }
 
-  private get(endpoint: string) {
-    return fetch(this.endpoint(endpoint), {
+  private get(endpoint: string, params: { [key: string]: string } = {}, page?: number, perPage?: number) {
+    if (page) {
+      params.page = page.toString();
+    }
+    if (perPage) {
+      params.perPage = perPage.toString();
+    }
+    const search = new URLSearchParams(params);
+    return fetch(this.endpoint(endpoint + '?' + search.toString()), {
       headers: this.headers,
     });
+  }
+  private getJson<T>(endpoint: string, params: { [key: string]: string } = {}, page?: number, perPage?: number): Promise<T> {
+    return this.get(endpoint, params, page, perPage).then((res) => res.ok ? (res.json() as Promise<T>) : Promise.reject(res.statusText));
   }
   private post(endpoint: string, body: { [key: string]: any }) {
     return fetch(this.endpoint(endpoint), {
@@ -35,25 +45,24 @@ class SnippetRegistry {
   }
 
   public getSnippets(page?: number, perPage?: number): Promise<Snippet[]> {
-    const params = {} as { [key: string]: string };
-    if (page) {
-      params.page = page.toString();
-    }
-    if (perPage) {
-      params.perPage = perPage.toString();
-    }
-    const search = new URLSearchParams(params);
-    return this.get("snippets/public?" + search.toString()).then((res) =>
+    return this.get("snippets/public", {}, page, perPage).then((res) =>
       res.json() as Promise<Snippet[]>
     );
   }
 
+  public getUserProjects(page?: number, perPage?: number): Promise<Project[]> {
+    return this.getJson("projects", {
+      min_access_level: "30",
+      order_by: "last_activity_at"
+    }, page, perPage);
+  }
+
   public getUserSnippets(): Promise<Snippet[]> {
-    return this.get("snippets").then((res) => res.json() as Promise<Snippet[]>);
+    return this.getJson("snippets");
   }
 
   public getSnippet(id: number): Promise<Snippet> {
-    return this.get(`snippets/${id}`).then((res) => res.json() as Promise<Snippet>);
+    return this.getJson(`snippets/${id}`);
   }
 
   public getSnippetContent(id: number, path?: string): Promise<string> {
@@ -61,8 +70,8 @@ class SnippetRegistry {
     return this.get(url).then((res) => res.text());
   }
 
-  public publish(data: NewSnippet) {
-    return this.post("snippets", data);
+  public publish(data: NewSnippet, project?: number | string) {
+    return this.post(project ? `projects/${project}/snippets` : "snippets", data);
   }
 }
 export default SnippetRegistry;
