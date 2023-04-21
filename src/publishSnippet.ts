@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { window, Memento } from 'vscode';
+import { window, Memento, QuickPickItem } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
 import addHost from './addHost';
 import { VISIBILITY } from './constants';
@@ -33,14 +33,18 @@ export default async function publish(state: Memento) {
   }
   const projects = await api?.getUserProjects() || [];
   const project = await window.showQuickPick(
-    projects.map((project) => ({
-      label: project.name,
-      description: project.name,
-      details: project.path_with_namespace
-    })),
+    [
+      {
+        label: 'No, I want to publish it as a global snippet.',
+      } as QuickPickItem,
+      ...projects.map((project) => ({
+        label: project.name,
+        description: project.path_with_namespace
+      }))
+    ],
     {
       canPickMany: false,
-      placeHolder: 'Are you publishing into a project? If so, choose one below.',
+      placeHolder: 'Are you publishing into a project? If so, choose one.',
     }
   );
   const activeEditorPath = activeTextEditor.document.fileName;
@@ -55,6 +59,7 @@ export default async function publish(state: Memento) {
   const title = await window.showInputBox({
     ignoreFocusOut: true,
     prompt: 'Enter a title',
+    value: fileName,
     validateInput(value) {
       if (!value || !value.trim()) {
         return 'Title is required!';
@@ -82,9 +87,9 @@ export default async function publish(state: Memento) {
     visibility,
     content,
   };
-  await api?.publish(snippet, project && encodeURIComponent(project.details));
+  await api?.publish(snippet, project?.description && encodeURIComponent(project.description));
   window.showInformationMessage(
-    `Successfully published "${fileName || title}" to ${api?.host.host}!`
+    `Successfully published "${fileName || title}" to ${project?.description ?? api?.host.host}!`
   );
   return {
     snippet,
