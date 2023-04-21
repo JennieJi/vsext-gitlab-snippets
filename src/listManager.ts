@@ -26,11 +26,18 @@ export default function listManager<T>(
       get().filter((item) => getId(item) !== id)
     );
   };
+  const update = (id: string, updatedItem: Partial<T>) => {
+    return state.update(
+      key,
+      get().map((item) => (getId(item) === id ? { ...item, ...updatedItem } : item))
+    );
+  };
   return {
     key,
     get,
     getById,
     add,
     remove,
+    update
   };
 }

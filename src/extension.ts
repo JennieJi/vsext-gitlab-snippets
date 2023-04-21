@@ -1,6 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, TreeView } from "vscode";
+import { ExtensionContext, commands, TreeView, Memento } from "vscode";
 import commandName, { Command } from "./commandName";
 import addHost from "./addHost";
 import publish from "./publishSnippet";
@@ -15,6 +15,7 @@ import viewSnippetInBrowser from "./viewSnippetInBrowser";
 import { Snippet, StaredSnippet, Host } from "./types";
 import downloadSnippet from "./downloadSnippet";
 import { removeHostSelector, removeHost } from "./removeHost";
+import updateToken from "./updateToken";
 
 let views = [] as TreeView<any>[];
 
@@ -70,13 +71,13 @@ export function activate(context: ExtensionContext) {
       "publish",
       async () => {
         const res = await publish(globalState);
-        mySnippetsProvider.reload(res?.registry?.host);
+        mySnippetsProvider.reload(res?.registry?.host.host);
       },
     ],
-    ["reloadMySnippets", (host: Host) => mySnippetsProvider.reload(host)],
+    ["reloadMySnippets", (host: string) => mySnippetsProvider.reload(host)],
     [
       "reloadExploreSnippets",
-      (host: Host) => hostSnippetsProvider.reload(host),
+      (host: string) => hostSnippetsProvider.reload(host),
     ],
     [
       "star",
@@ -107,13 +108,18 @@ export function activate(context: ExtensionContext) {
     ["viewSnippet", viewSnippet],
     ["viewSnippetInBrowser", viewSnippetInBrowser],
     ["exploreMore", () => hostSnippetsProvider.loadMore()],
+    ["updateToken", async ({ host }: Host) => {
+      await updateToken(globalState, host);
+      hostSnippetsProvider.reload(host);
+      mySnippetsProvider.reload(host);
+    }]
   ].forEach(([cmd, callback]) =>
     subscriptions.push(
       commands.registerCommand(
         commandName(cmd as Command),
         callback as () => void
       )
-    )
+    ),
   );
   mySnippetsProvider.openLastest();
 }

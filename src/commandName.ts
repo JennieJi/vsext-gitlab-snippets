@@ -8,7 +8,8 @@ export type Command =
   | "unstar"
   | "viewSnippet"
   | "viewSnippetInBrowser"
-  | "exploreMore";
+  | "exploreMore"
+  | "updateToken";
 
 export default function commandName(shorthand: Command) {
   return `${CMD_PREFIX}${shorthand}`;

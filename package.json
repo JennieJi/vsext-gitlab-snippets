@@ -103,6 +103,10 @@
         "command": "gitlabSnippets.reloadExploreSnippets",
         "title": "Reload",
         "icon": "$(sync)"
+      },
+      {
+        "command": "gitlabSnippets.updateToken",
+        "title": "Update Token"
       }
     ],
     "menus": {
@@ -142,11 +146,20 @@
         {
           "command": "gitlabSnippets.viewSnippetInBrowser",
           "when": "false"
+        },
+        {
+          "command": "gitlabSnippets.updateToken",
+          "when": "false"
         }
       ],
       "view/item/context": [
         {
           "command": "gitlabSnippets.removeHost",
+          "when": "viewItem == host",
+          "group": "action"
+        },
+        {
+          "command": "gitlabSnippets.updateToken",
           "when": "viewItem == host",
           "group": "action"
         },

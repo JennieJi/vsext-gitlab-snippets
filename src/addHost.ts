@@ -1,6 +1,7 @@
 import { window, Memento } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
 import hostManager from './hostManager';
+import { showTokenInput } from './updateToken';
 
 export default async function addHost(state: Memento) {
   let host = await window.showInputBox({
@@ -17,18 +18,8 @@ export default async function addHost(state: Memento) {
   if (!host) {
     return;
   }
-  const token = await window.showInputBox({
-    ignoreFocusOut: true,
-    prompt: 'Enter your Gitlab token',
-    validateInput(value) {
-      if (!value || !value.trim()) {
-        return 'Personal token is required!';
-      }
-    },
-  });
-  if (!token) {
-    return;
-  }
+  const token = await showTokenInput();
+  if (!token) return;
   const version = await window.showQuickPick(['4', '3'], {
     canPickMany: false,
     placeHolder: 'Choose host API version',

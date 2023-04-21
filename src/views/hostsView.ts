@@ -67,9 +67,9 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet | Snipp
     return registry.getSnippets(1, this.activeLimit);
   }
 
-  public reload(host?: Host) {
+  public reload(host?: string) {
     if (host) {
-      this.activeHost = host.host;
+      this.activeHost = host;
     }
     this._onDidChangeTreeData.fire();
   }
