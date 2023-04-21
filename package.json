@@ -1,6 +1,6 @@
 {
   "name": "gitlab-snippets",
-  "displayName": "Gitlab Snippets",
+  "displayName": "GitLab Snippets",
   "description": "Use gilab snippets easily",
   "version": "0.4.0",
   "publisher": "jyee721",
@@ -40,23 +40,23 @@
     "commands": [
       {
         "command": "gitlabSnippets.publish",
-        "category": "Gitlab Snippets",
-        "title": "Publish snippet"
+        "category": "GitLab Snippets",
+        "title": "Publish to GitLab snippets"
       },
       {
         "command": "gitlabSnippets.addHost",
-        "category": "Gitlab Snippets",
+        "category": "GitLab Snippets",
         "title": "Add GitLab host",
         "icon": "$(search-expand-results)"
       },
       {
         "command": "gitlabSnippets.removeHostSelector",
-        "category": "Gitlab Snippets",
+        "category": "GitLab Snippets",
         "title": "Remove GitLab host"
       },
       {
         "command": "gitlabSnippets.removeHost",
-        "category": "Gitlab Snippets",
+        "category": "GitLab Snippets",
         "title": "Remove GitLab host",
         "icon": "$(notebook-delete-cell)"
       },
@@ -67,7 +67,7 @@
       },
       {
         "command": "gitlabSnippets.starById",
-        "category": "Gitlab Snippets",
+        "category": "GitLab Snippets",
         "title": "Add snippet by ID",
         "icon": "$(add)"
       },
@@ -200,13 +200,23 @@
           "when": "view =~ /^gitlabSnippetsExplorer-(mine|all)$/",
           "group": "navigation"
         }
+      ],
+      "editor/context": [
+        {
+          "command": "gitlabSnippets.publish"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "gitlabSnippets.publish"
+        }
       ]
     },
     "viewsContainers": {
       "activitybar": [
         {
           "id": "gitlabSnippetsExplorer",
-          "title": "Gitlab Snippets Explorer",
+          "title": "GitLab Snippets Explorer",
           "icon": "resources/icons/gitlab-logo.svg"
         }
       ]
