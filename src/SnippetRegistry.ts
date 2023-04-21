@@ -1,8 +1,25 @@
-import fetch from "node-fetch";
+import fetch, { Response } from "node-fetch";
 import { Memento, window } from "vscode";
-import { Host, Snippet, NewSnippet, StaredSnippet } from "./types";
+import { Host, Snippet, NewSnippet, StaredSnippet, Project } from "./types";
 import { URLSearchParams, URL } from "url";
 import hostManager from "./hostManager";
+
+interface GitlabError {
+  error: string,
+  error_description: string,
+  scope?: string
+}
+
+function jsonHandler<T>(res: Response): Promise<T> {
+  return (res.json() as Promise<T | GitlabError>)
+    .then((json) => {
+      if ((json as GitlabError)?.error) {
+        console.debug(json);
+        return Promise.reject((json as GitlabError).error_description);
+      }
+      return json as T;
+    });
+}
 class SnippetRegistry {
   public host: Host;
   private headers: { [key: string]: string };
@@ -12,6 +29,7 @@ class SnippetRegistry {
     this.headers = {
       "PRIVATE-TOKEN": host.token,
       "Content-Type": "application/json",
+      "accept": "application/json",
     };
   }
 
@@ -21,21 +39,7 @@ class SnippetRegistry {
     return ret.toString();
   }
 
-  private get(endpoint: string) {
-    return fetch(this.endpoint(endpoint), {
-      headers: this.headers,
-    });
-  }
-  private post(endpoint: string, body: { [key: string]: any }) {
-    return fetch(this.endpoint(endpoint), {
-      method: "POST",
-      headers: this.headers,
-      body: JSON.stringify(body),
-    });
-  }
-
-  public getSnippets(page?: number, perPage?: number): Promise<Snippet[]> {
-    const params = {} as { [key: string]: string };
+  private get(endpoint: string, params: { [key: string]: string } = {}, page?: number, perPage?: number) {
     if (page) {
       params.page = page.toString();
     }
@@ -43,17 +47,38 @@ class SnippetRegistry {
       params.perPage = perPage.toString();
     }
     const search = new URLSearchParams(params);
-    return this.get("snippets/public?" + search.toString()).then((res) =>
-      res.json() as Promise<Snippet[]>
-    );
+    return fetch(this.endpoint(endpoint + '?' + search.toString()), {
+      headers: this.headers,
+    });
+  }
+  private getJson<T>(endpoint: string, params: { [key: string]: string } = {}, page?: number, perPage?: number): Promise<T> {
+    return this.get(endpoint, params, page, perPage).then(jsonHandler) as Promise<T>;
+  }
+  private post<T>(endpoint: string, body: { [key: string]: any }): Promise<T> {
+    return fetch(this.endpoint(endpoint), {
+      method: "POST",
+      headers: this.headers,
+      body: JSON.stringify(body),
+    }).then(jsonHandler) as Promise<T>;
+  }
+
+  public getSnippets(page?: number, perPage?: number): Promise<Snippet[]> {
+    return this.getJson<Snippet[]>("snippets/public", {}, page, perPage);
+  }
+
+  public getUserProjects(page?: number, perPage?: number): Promise<Project[]> {
+    return this.getJson("projects", {
+      min_access_level: "30",
+      order_by: "last_activity_at"
+    }, page, perPage);
   }
 
   public getUserSnippets(): Promise<Snippet[]> {
-    return this.get("snippets").then((res) => res.json() as Promise<Snippet[]>);
+    return this.getJson("snippets");
   }
 
   public getSnippet(id: number): Promise<Snippet> {
-    return this.get(`snippets/${id}`).then((res) => res.json() as Promise<Snippet>);
+    return this.getJson(`snippets/${id}`);
   }
 
   public getSnippetContent(id: number, path?: string): Promise<string> {
@@ -61,8 +86,8 @@ class SnippetRegistry {
     return this.get(url).then((res) => res.text());
   }
 
-  public publish(data: NewSnippet) {
-    return this.post("snippets", data);
+  public publish<T = void>(data: NewSnippet, project?: number | string): Promise<T> {
+    return this.post<T>(project ? `projects/${project}/snippets` : "snippets", data);
   }
 }
 export default SnippetRegistry;

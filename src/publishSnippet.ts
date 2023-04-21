@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { window, Memento } from 'vscode';
+import { window, Memento, QuickPickItem } from 'vscode';
 import SnippetRegistry from './SnippetRegistry';
 import addHost from './addHost';
 import { VISIBILITY } from './constants';
@@ -9,12 +9,12 @@ import chooseHost from './chooseHost';
 export default async function publish(state: Memento) {
   const { activeTextEditor } = window;
   if (!activeTextEditor) {
-    window.showErrorMessage('Please open the file first!');
+    window.showErrorMessage('Please open a file first!');
     return;
   }
   const content = activeTextEditor.document.getText();
   if (!content) {
-    window.showErrorMessage('Could not publish an empty file!');
+    window.showErrorMessage('Publishing an empty file is not a good idea!');
     return;
   }
 
@@ -31,10 +31,26 @@ export default async function publish(state: Memento) {
     }
     api = new SnippetRegistry(hostConfig);
   }
+  const projects = await api?.getUserProjects() || [];
+  const project = await window.showQuickPick(
+    [
+      {
+        label: 'No, I want to publish it as a global snippet.',
+      } as QuickPickItem,
+      ...projects.map((project) => ({
+        label: project.name,
+        description: project.path_with_namespace
+      }))
+    ],
+    {
+      canPickMany: false,
+      placeHolder: 'Are you publishing into a project? If so, choose one.',
+    }
+  );
   const activeEditorPath = activeTextEditor.document.fileName;
   const fileName = await window.showInputBox({
     ignoreFocusOut: true,
-    prompt: 'Enter file name with extention. E.g., "example.js".',
+    prompt: 'Enter a file name with extension. E.g., "example.js".',
     value: activeEditorPath ? path.basename(activeEditorPath) : undefined,
   });
   if (!fileName) {
@@ -43,6 +59,7 @@ export default async function publish(state: Memento) {
   const title = await window.showInputBox({
     ignoreFocusOut: true,
     prompt: 'Enter a title',
+    value: fileName,
     validateInput(value) {
       if (!value || !value.trim()) {
         return 'Title is required!';
@@ -70,9 +87,9 @@ export default async function publish(state: Memento) {
     visibility,
     content,
   };
-  await api?.publish(snippet);
+  await api?.publish(snippet, project?.description && encodeURIComponent(project.description));
   window.showInformationMessage(
-    `Successfully published "${fileName || title}" to ${api?.host.host}!`
+    `Successfully published "${fileName || title}" to ${project?.description ?? api?.host.host}!`
   );
   return {
     snippet,

@@ -2,7 +2,7 @@
   "name": "gitlab-snippets",
   "displayName": "Gitlab Snippets",
   "description": "Use gilab snippets easily",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "jyee721",
   "icon": "resources/icons/gitlab-logo.png",
   "author": {
@@ -46,18 +46,18 @@
       {
         "command": "gitlabSnippets.addHost",
         "category": "Gitlab Snippets",
-        "title": "Add gitlab host",
+        "title": "Add GitLab host",
         "icon": "$(search-expand-results)"
       },
       {
         "command": "gitlabSnippets.removeHostSelector",
         "category": "Gitlab Snippets",
-        "title": "Remove gitlab host"
+        "title": "Remove GitLab host"
       },
       {
         "command": "gitlabSnippets.removeHost",
         "category": "Gitlab Snippets",
-        "title": "Remove gitlab host",
+        "title": "Remove GitLab host",
         "icon": "$(notebook-delete-cell)"
       },
       {
@@ -148,7 +148,7 @@
         {
           "command": "gitlabSnippets.removeHost",
           "when": "viewItem == host",
-          "group": "inline"
+          "group": "action"
         },
         {
           "command": "gitlabSnippets.reloadMySnippets",
