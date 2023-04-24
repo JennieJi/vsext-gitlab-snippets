@@ -70,9 +70,9 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet | Snipp
     }
     if ((el as SnippetFileExtended).path) {
       const { path, snippet } = el as SnippetFileExtended;
-      return getSnippetItem(this.state, "mine-", snippet, path);
+      return getSnippetItem(this.state, "mine-", snippet, path, { hideAuthor: true });
     }
-    return getSnippetItem(this.state, "mine-", el as Snippet);
+    return getSnippetItem(this.state, "mine-", el as Snippet, undefined, { hideAuthor: true });
   }
 }
 

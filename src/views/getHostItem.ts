@@ -12,6 +12,6 @@ export default function getHostItem(
     collapsibleState: isExpanded
       ? TreeItemCollapsibleState.Expanded
       : TreeItemCollapsibleState.Collapsed,
-    iconPath: ThemeIcon.Folder,
+    iconPath: new ThemeIcon('remote-explorer-view-icon'),
   };
 }

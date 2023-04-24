@@ -6,7 +6,12 @@ export default function getSnippetItem(
   state: Memento,
   prefix: string,
   snippet: Snippet,
-  path?: string
+  path?: string,
+  {
+    hideAuthor
+  }: {
+    hideAuthor?: boolean;
+  } = {}
 ): TreeItem {
   const { raw_url: url, title, file_name: fileName, author, files, description: tooltip } = snippet;
   if (!path && files.length > 1) {
@@ -14,7 +19,7 @@ export default function getSnippetItem(
       label: title,
       id: prefix + url,
       contextValue: "snippetRepo",
-      description: `- ${author.name}`,
+      description: hideAuthor ? '' : `- ${author.name}`,
       iconPath: new ThemeIcon("repo"),
       collapsibleState: TreeItemCollapsibleState.Collapsed,
       tooltip,
@@ -39,7 +44,7 @@ export default function getSnippetItem(
     label: title,
     id: prefix + url,
     contextValue: "snippet",
-    description: `${fileName} - ${author.name}`,
+    description: hideAuthor ? fileName : `${fileName} - ${author.name}`,
     iconPath: new ThemeIcon("code"),
     command,
     tooltip,
