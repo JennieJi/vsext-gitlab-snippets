@@ -21,6 +21,10 @@ export class SnippetsProvider implements TreeDataProvider<Host | SnippetGroup | 
 
   private state: Memento;
 
+  private registries: {
+    [host: string]: SnippetRegistry
+  } = {};
+
   private _activeHost: string | undefined;
   get activeHost() {
     return this._activeHost || "";
@@ -37,11 +41,11 @@ export class SnippetsProvider implements TreeDataProvider<Host | SnippetGroup | 
     return hostManager(this.state).get();
   }
 
-  private getSnippets(host: Host) {
-    const registry = new SnippetRegistry(host);
+  private getSnippets(host: string) {
+    const registry = this.registries[host];
     return registry.getUserSnippets();
   }
-  private async getGroupedSnippets(host: Host): Promise<SnippetGroup[]> {
+  private async getGroupedSnippets(host: string): Promise<SnippetGroup[]> {
     const snippets = await this.getSnippets(host);
     if (!snippets.length) { return []; }
     const groups: {
@@ -49,7 +53,7 @@ export class SnippetsProvider implements TreeDataProvider<Host | SnippetGroup | 
     } = {
       global: {
         type: SNIPPET_GROUP.category,
-        host: host.host,
+        host,
         label: "Global",
         snippets: []
       }
@@ -61,7 +65,7 @@ export class SnippetsProvider implements TreeDataProvider<Host | SnippetGroup | 
         group = groups[projectId] = {
           type: SNIPPET_GROUP.project,
           projectId: projectId,
-          host: host.host,
+          host,
           snippets: []
         };
       }
@@ -84,13 +88,18 @@ export class SnippetsProvider implements TreeDataProvider<Host | SnippetGroup | 
 
   public async getChildren(el?: Host | SnippetGroup | Snippet): Promise<Host[] | SnippetGroup[] | Snippet[] | SnippetFileExtended[]> {
     if (!el) {
-      return this.getHosts();
+      const hosts = this.getHosts();
+      this.registries = hosts.reduce((res, host) => {
+        res[host.host] = new SnippetRegistry(host);
+        return res;
+      }, {} as { [host: string]: SnippetRegistry });
+      return hosts;
     }
     if ((el as SnippetGroup).snippets) {
       return (el as SnippetGroup).snippets;
     }
     if ((el as Host).host) {
-      return this.getGroupedSnippets(el as Host);
+      return this.getGroupedSnippets((el as Host).host);
     }
     return (el as Snippet).files.map(f => ({
       ...f,
@@ -99,10 +108,17 @@ export class SnippetsProvider implements TreeDataProvider<Host | SnippetGroup | 
   }
 
   private async getGroupItem(prefix: string, group: SnippetGroup): Promise<TreeItem> {
-    console.log(group);
     if (group.type === SNIPPET_GROUP.project) {
+      let label = `Project ${group.projectId.toString()}`;
+      try {
+        const registry = this.registries[group.host];
+        const project = await registry.getProject(group.projectId);
+        label = project.name;
+      } catch (e) {
+        // ignore
+      }
       return {
-        label: group.projectId.toString(),
+        label,
         id: prefix + group.projectId.toString(),
         collapsibleState: TreeItemCollapsibleState.Collapsed,
         contextValue: "snippetGroup",
