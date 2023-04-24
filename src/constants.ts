@@ -5,3 +5,8 @@ export enum VISIBILITY {
   internal = 'internal',
   public = 'public',
 }
+
+export enum SNIPPET_GROUP {
+  category = 0,
+  project = 1,
+}

@@ -5,14 +5,17 @@ import {
   Event,
   Memento,
   window,
+  TreeItemCollapsibleState,
+  ThemeIcon,
 } from "vscode";
-import { Host, Snippet, SnippetFileExtended } from "../types";
+import { Host, Snippet, SnippetFileExtended, SnippetGroup } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
 import SnippetRegistry from "../SnippetRegistry";
 import hostManager from "../hostManager";
+import { SNIPPET_GROUP } from "../constants";
 
-export class SnippetsProvider implements TreeDataProvider<Host | Snippet | SnippetFileExtended> {
+export class SnippetsProvider implements TreeDataProvider<Host | SnippetGroup | Snippet | SnippetFileExtended> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
@@ -38,6 +41,34 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet | Snipp
     const registry = new SnippetRegistry(host);
     return registry.getUserSnippets();
   }
+  private async getGroupedSnippets(host: Host): Promise<SnippetGroup[]> {
+    const snippets = await this.getSnippets(host);
+    if (!snippets.length) { return []; }
+    const groups: {
+      [key: string]: SnippetGroup
+    } = {
+      global: {
+        type: SNIPPET_GROUP.category,
+        host: host.host,
+        label: "Global",
+        snippets: []
+      }
+    };
+    snippets.forEach(snippet => {
+      const { project_id: projectId } = snippet;
+      let group = groups[projectId ?? 'global'];
+      if (!group && projectId) {
+        group = groups[projectId] = {
+          type: SNIPPET_GROUP.project,
+          projectId: projectId,
+          host: host.host,
+          snippets: []
+        };
+      }
+      group.snippets.push(snippet);
+    });
+    return Object.values(groups)
+  }
 
   public reload(host?: string) {
     if (host) {
@@ -51,12 +82,15 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet | Snipp
     this.reload();
   }
 
-  public async getChildren(el?: Host | Snippet): Promise<Host[] | Snippet[] | SnippetFileExtended[]> {
+  public async getChildren(el?: Host | SnippetGroup | Snippet): Promise<Host[] | SnippetGroup[] | Snippet[] | SnippetFileExtended[]> {
     if (!el) {
       return this.getHosts();
     }
+    if ((el as SnippetGroup).snippets) {
+      return (el as SnippetGroup).snippets;
+    }
     if ((el as Host).host) {
-      return this.getSnippets(el as Host);
+      return this.getGroupedSnippets(el as Host);
     }
     return (el as Snippet).files.map(f => ({
       ...f,
@@ -64,9 +98,32 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet | Snipp
     } as SnippetFileExtended));
   }
 
-  public getTreeItem(el: Host | Snippet | SnippetFileExtended): TreeItem {
+  private async getGroupItem(prefix: string, group: SnippetGroup): Promise<TreeItem> {
+    console.log(group);
+    if (group.type === SNIPPET_GROUP.project) {
+      return {
+        label: group.projectId.toString(),
+        id: prefix + group.projectId.toString(),
+        collapsibleState: TreeItemCollapsibleState.Collapsed,
+        contextValue: "snippetGroup",
+        iconPath: new ThemeIcon("folder"),
+      };
+    }
+    return {
+      label: group.label,
+      id: prefix + group.label,
+      collapsibleState: TreeItemCollapsibleState.Expanded,
+      contextValue: "snippetGroup",
+      iconPath: new ThemeIcon("folder"),
+    };
+  }
+
+  public async getTreeItem(el: Host | SnippetGroup | Snippet | SnippetFileExtended): Promise<TreeItem> {
+    if ((el as SnippetGroup).snippets) {
+      return this.getGroupItem(`mine-${(el as SnippetGroup).host}-`, el as SnippetGroup);
+    }
     if ((el as Host).host) {
-      return getHostItem(el as Host, this.activeHost === (el as Host).host);
+      return getHostItem(el as Host, this.activeHost === (el as Host).host, 'mine-');
     }
     if ((el as SnippetFileExtended).path) {
       const { path, snippet } = el as SnippetFileExtended;

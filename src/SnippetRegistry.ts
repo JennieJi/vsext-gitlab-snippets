@@ -73,6 +73,10 @@ class SnippetRegistry {
     }, page, perPage);
   }
 
+  public getProject(id: number): Promise<Project> {
+    return this.getJson(`projects/${id}`);
+  }
+
   public getUserSnippets(): Promise<Snippet[]> {
     return this.getJson("snippets");
   }

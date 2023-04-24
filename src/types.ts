@@ -1,3 +1,5 @@
+import { SNIPPET_GROUP } from "./constants";
+
 export interface Host {
   host: string;
   token: string;
@@ -18,7 +20,7 @@ export interface Snippet {
   author: Author;
   updated_at: string;
   created_at: string;
-  project_id: string | null;
+  project_id: number | null;
   web_url: string;
   raw_url: string;
   files: SnippetFile[];
@@ -37,6 +39,21 @@ export type NewSnippet = Pick<
 > & {
   content: string;
 };
+
+export type SnippetGroup = SnippetGroupCategory | SnippetGroupProject;
+interface SnippetGroupBase {
+  host: string,
+  type: SNIPPET_GROUP;
+  snippets: Snippet[];
+}
+export interface SnippetGroupCategory extends SnippetGroupBase {
+  type: SNIPPET_GROUP.category,
+  label: string,
+}
+export interface SnippetGroupProject extends SnippetGroupBase {
+  type: SNIPPET_GROUP.project,
+  projectId: number,
+}
 
 export interface Author {
   id: number;

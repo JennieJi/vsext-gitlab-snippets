@@ -102,7 +102,7 @@ export class SnippetsProvider implements TreeDataProvider<Host | Snippet | Snipp
 
   public getTreeItem(el: Host | Snippet | SnippetFileExtended): TreeItem {
     if ((el as Host).host) {
-      return getHostItem(el as Host, this.activeHost === (el as Host).host);
+      return getHostItem(el as Host, this.activeHost === (el as Host).host, 'host-');
     }
     if ((el as SnippetFileExtended).path) {
       const { path, snippet } = el as SnippetFileExtended;
