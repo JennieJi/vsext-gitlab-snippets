@@ -12,36 +12,28 @@ export default function getSnippetItem(
   } = {}
 ): TreeItem {
   const { title, file_name: fileName, author, files, description: tooltip } = snippet;
+  const item = new TreeItem(title);
   if (!path && files.length > 1) {
-    return {
-      label: title,
-      contextValue: "snippetRepo",
-      description: hideAuthor ? '' : `- ${author.name}`,
-      iconPath: new ThemeIcon("repo"),
-      collapsibleState: TreeItemCollapsibleState.Collapsed,
-      tooltip,
+    item.contextValue = "snippetRepo",
+      item.description = hideAuthor ? '' : `- ${author.name}`,
+      item.iconPath = new ThemeIcon("repo"),
+      item.collapsibleState = TreeItemCollapsibleState.Collapsed,
+      item.tooltip = tooltip;
+  } else {
+    item.command = {
+      command: commandName("viewSnippet"),
+      arguments: [snippet, path],
+      title: `Preview snippet`,
     };
+    item.iconPath = new ThemeIcon("code");
+    if (path) {
+      item.label = path;
+      item.contextValue = "snippetFile";
+    } else {
+      item.contextValue = "snippet";
+      item.description = hideAuthor ? fileName : `${fileName} - ${author.name}`;
+      item.tooltip = tooltip;
+    }
   }
-  const command = {
-    command: commandName("viewSnippet"),
-    arguments: [snippet, path],
-    title: `Preview snippet`,
-  };
-  if (path) {
-    return {
-      label: path,
-      contextValue: "snippetFile",
-      description: '',
-      iconPath: new ThemeIcon("code"),
-      command,
-    };
-  }
-  return {
-    label: title,
-    contextValue: "snippet",
-    description: hideAuthor ? fileName : `${fileName} - ${author.name}`,
-    iconPath: new ThemeIcon("code"),
-    command,
-    tooltip,
-  };
+  return item;
 }

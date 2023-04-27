@@ -5,12 +5,10 @@ export default function getHostItem(
   { host }: Host,
   isExpanded = false,
 ): TreeItem {
-  return {
-    label: host.replace(/\w+:\/\//, ''),
-    contextValue: 'host',
-    collapsibleState: isExpanded
-      ? TreeItemCollapsibleState.Expanded
-      : TreeItemCollapsibleState.Collapsed,
-    iconPath: new ThemeIcon('remote-explorer-view-icon'),
-  };
+  const item = new TreeItem(host.replace(/\w+:\/\//, ''), isExpanded
+    ? TreeItemCollapsibleState.Expanded
+    : TreeItemCollapsibleState.Collapsed);
+  item.contextValue = 'host';
+  item.iconPath = new ThemeIcon('remote-explorer-view-icon');
+  return item;
 }
