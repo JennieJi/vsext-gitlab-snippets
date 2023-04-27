@@ -26,7 +26,9 @@ export default function hostManager(state: Memento) {
     };
   };
   const getLastUse = (): string => (state.get(LAST_USE) || helpers.get()?.[0]?.host || "");
-  const setLastUse = (host: string) => state.update(LAST_USE, host);
+  const setLastUse = (host: string) => {
+    state.update(LAST_USE, host);
+  }
   const add = (host: Host) => {
     helpers.add(host);
     initRegistry(host);
@@ -51,9 +53,7 @@ export default function hostManager(state: Memento) {
     add,
     remove,
     update,
-    get lastUse() {
-      return getLastUse();
-    },
-    set lastUse(val: string) { setLastUse(val); }
+    getLastUse,
+    setLastUse
   };
 }

@@ -6,7 +6,7 @@ import {
   TreeItemCollapsibleState,
   ThemeIcon,
 } from "vscode";
-import { Host, HostRegistry, Snippet, SnippetExtended, SnippetFileExtended, SnippetGroup } from "../types";
+import { Host, HostRegistry, SnippetExtended, SnippetFileExtended, SnippetGroup } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
 import hostManager from "../hostManager";
@@ -24,7 +24,7 @@ export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup 
 
   public reload(host?: string) {
     if (host) {
-      this.hosts.lastUse = host;
+      this.hosts.setLastUse(host);
     }
     this._onDidChangeTreeData.fire();
   }
@@ -81,7 +81,7 @@ export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup 
       const { registry } = this.hosts.getById(group.host) as HostRegistry;
       try {
         const project = await registry.getProject(group.projectId);
-        label = project.name;
+        label = project.path;
       } catch (e) {
         // ignore
       }
@@ -111,6 +111,6 @@ export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup 
       const { path, snippet } = el as SnippetFileExtended;
       return getSnippetItem(snippet, path, { hideAuthor: true });
     }
-    return getHostItem(el as Host, this.hosts.lastUse === (el as Host).host);
+    return getHostItem(el as Host, this.hosts.getLastUse() === (el as Host).host);
   }
 }

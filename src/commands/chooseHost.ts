@@ -1,7 +1,7 @@
 import { window } from 'vscode';
-import hostManager from './hostManager';
+import hostManager from '../hostManager';
 import addHost from './addHost';
-import { HostRegistry } from './types';
+import { HostRegistry } from '../types';
 
 const ADD_NEW = 'Add new...';
 

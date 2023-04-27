@@ -1,7 +1,7 @@
 import { window } from 'vscode';
-import { starManager } from './starManager';
+import { starManager } from '../starManager';
 import chooseHost from './chooseHost';
-import hostManager from './hostManager';
+import hostManager from '../hostManager';
 
 export default async function starById(hosts: ReturnType<typeof hostManager>, stared: ReturnType<typeof starManager>) {
   const host = await chooseHost(

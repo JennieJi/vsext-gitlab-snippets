@@ -1,8 +1,8 @@
 import * as path from 'path';
 import { window, QuickPickItem } from 'vscode';
 import addHost from './addHost';
-import { VISIBILITY } from './constants';
-import hostManager from './hostManager';
+import { VISIBILITY } from '../constants';
+import hostManager from '../hostManager';
 import chooseHost from './chooseHost';
 
 export default async function publish(hostManage: ReturnType<typeof hostManager>) {

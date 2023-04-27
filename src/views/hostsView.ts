@@ -26,7 +26,7 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
 
   public reload(host?: string) {
     if (host) {
-      this.hosts.lastUse = host;
+      this.hosts.setLastUse(host);
     }
     this._onDidChangeTreeData.fire();
   }
@@ -47,7 +47,6 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
   private getLoadMoreItem(): TreeItem {
     return {
       label: "Load more ...",
-      id: `${this.hosts.lastUse}-loadmore`,
       iconPath: new ThemeIcon("chevron-down"),
       command: {
         command: commandName("exploreMore"),
@@ -99,7 +98,7 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
       return getSnippetItem(el as SnippetExtended);
     }
     if ((el as Host).host) {
-      return getHostItem(el as Host, this.hosts.lastUse === (el as Host).host);
+      return getHostItem(el as Host, this.hosts.getLastUse() === (el as Host).host);
     }
     return this.getLoadMoreItem();
   }

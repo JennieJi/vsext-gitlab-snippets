@@ -1,7 +1,7 @@
 import { window, workspace } from "vscode";
 import * as fs from "fs";
-import { HostRegistry, SnippetExtended, SnippetFileExtended } from "./types";
-import hostManager from "./hostManager";
+import { HostRegistry, SnippetExtended, SnippetFileExtended } from "../types";
+import hostManager from "../hostManager";
 
 export default async function downloadSnippet(
   hosts: ReturnType<typeof hostManager>,

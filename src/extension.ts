@@ -1,18 +1,18 @@
 import { ExtensionContext, commands, TreeView, window } from "vscode";
 import commandName, { Command } from "./commandName";
-import addHost from "./addHost";
-import publish from "./publishSnippet";
+import addHost from "./commands/addHost";
+import publish from "./commands/publishSnippet";
 import { StaredSnippetsProvider } from "./views/staredView";
 import { HostSnippetsProvider } from "./views/hostsView";
 import { MySnippetsProvider } from "./views/myView";
 import { starManager } from "./starManager";
-import starById from "./starById";
-import viewSnippet from "./viewSnippet";
-import viewSnippetInBrowser from "./viewSnippetInBrowser";
+import starById from "./commands/starById";
+import viewSnippet from "./commands/viewSnippet";
+import viewSnippetInBrowser from "./commands/viewSnippetInBrowser";
 import { Snippet, StaredSnippet, Host, SnippetFileExtended, SnippetExtended } from "./types";
-import downloadSnippet from "./downloadSnippet";
-import { removeHostSelector, removeHost } from "./removeHost";
-import updateToken from "./updateToken";
+import downloadSnippet from "./commands/downloadSnippet";
+import { removeHostSelector, removeHost } from "./commands/removeHost";
+import updateToken from "./commands/updateToken";
 import hostManager from "./hostManager";
 
 let views = [] as TreeView<any>[];
@@ -68,10 +68,10 @@ export function activate(context: ExtensionContext) {
           }
         })
     ],
-    ["reloadMySnippets", (host: string) => mySnippetsProvider.reload(host)],
+    ["reloadMySnippets", ({ host }: Host) => mySnippetsProvider.reload(host)],
     [
       "reloadExploreSnippets",
-      (host: string) => hostSnippetsProvider.reload(host),
+      ({ host }: Host) => hostSnippetsProvider.reload(host),
     ],
     [
       "star",

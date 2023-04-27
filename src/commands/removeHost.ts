@@ -1,5 +1,5 @@
 import { window } from 'vscode';
-import hostManager from './hostManager';
+import hostManager from '../hostManager';
 
 const confirmOptions = {
   y: 'Yes, remove it!',

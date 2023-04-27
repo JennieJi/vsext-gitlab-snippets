@@ -1,9 +1,9 @@
 import { window, workspace } from "vscode";
-import { HostRegistry, Snippet, SnippetExtended } from "./types";
-import SnippetRegistry from "./SnippetRegistry";
+import { HostRegistry, Snippet, SnippetExtended } from "../types";
+import SnippetRegistry from "../SnippetRegistry";
 import fetch from "node-fetch";
 import * as yaml from "js-yaml";
-import hostManager from "./hostManager";
+import hostManager from "../hostManager";
 
 interface Lang {
   ace_mode: string;

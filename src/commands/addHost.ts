@@ -1,6 +1,6 @@
 import { window } from 'vscode';
-import hostManager from './hostManager';
-import { HostRegistry } from './types';
+import hostManager from '../hostManager';
+import { HostRegistry } from '../types';
 import { showTokenInput } from './updateToken';
 
 export default async function addHost(hostManage: ReturnType<typeof hostManager>): Promise<HostRegistry | undefined> {
