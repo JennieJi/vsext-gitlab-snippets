@@ -1,4 +1,4 @@
-import { Memento, window } from 'vscode';
+import { window } from 'vscode';
 import hostManager from './hostManager'; false
 
 export function showTokenInput() {
@@ -13,10 +13,10 @@ export function showTokenInput() {
   });
 }
 
-export default async function updateToken(state: Memento, host: string) {
+export default async function updateToken(hosts: ReturnType<typeof hostManager>, host: string) {
   const token = await showTokenInput();
   if (!token) return;
-  hostManager(state).update(host, {
+  hosts.update(host, {
     token
   });
   window.showInformationMessage(`GitLab token of ${host} is updated!`);

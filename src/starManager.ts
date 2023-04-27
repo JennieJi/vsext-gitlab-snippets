@@ -2,23 +2,20 @@ import listManager from './listManager';
 import { StaredSnippet, Snippet } from './types';
 import { Memento } from 'vscode';
 
+const getId = (stared: StaredSnippet) => stared.raw_url;
+
 export function starManager(state: Memento) {
-  return listManager<StaredSnippet>(
+  const helpers = listManager<StaredSnippet>(
     'stared',
-    (stared: StaredSnippet) => stared.raw_url,
+    getId,
     state
   );
-}
-
-export function starSnippet(state: Memento, snippet: Snippet) {
-  const host = snippet.raw_url.replace(/^(\w+:\/\/)?([\w-\.]+)\/.*/, '$1$2');
-  return starManager(state).add({
-    ...snippet,
-    host,
-    starTime: Date.now(),
-  });
-}
-
-export function unstarSnippet(state: Memento, snippet: StaredSnippet) {
-  return starManager(state).remove(snippet.raw_url);
+  return {
+    ...helpers,
+    add: (snippet: Snippet) => helpers.add({
+      ...snippet,
+      starTime: Date.now(),
+      host: snippet.raw_url.replace(/^(\w+:\/\/)?([\w-\.]+)\/.*/, '$1$2')
+    }),
+  };
 }

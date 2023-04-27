@@ -1,16 +1,15 @@
-import { window, Memento, workspace } from "vscode";
+import { window, workspace } from "vscode";
 import * as fs from "fs";
-import { Snippet, SnippetFileExtended, StaredSnippet } from "./types";
-import { SnippetItem } from "./SnippetRegistry";
+import { HostRegistry, SnippetExtended, SnippetFileExtended } from "./types";
+import hostManager from "./hostManager";
 
 export default async function downloadSnippet(
-  state: Memento,
-  snippet: Snippet | SnippetFileExtended
+  hosts: ReturnType<typeof hostManager>,
+  source: SnippetExtended | SnippetFileExtended
 ) {
-  const raw = (snippet as SnippetFileExtended).snippet ?
-    // @ts-ignore
-    await new SnippetItem(state, snippet.snippet).getContent(snippet.path) :
-    await new SnippetItem(state, snippet as Snippet).getContent();
+  const snippet = (source as SnippetFileExtended).snippet ?? source;
+  const { registry } = hosts.getById(snippet.host) as HostRegistry;
+  const raw = await registry.getSnippetContent(snippet.id, (source as SnippetFileExtended).path);
   const targetPath = await window.showSaveDialog({
     defaultUri: workspace.workspaceFile,
     saveLabel: "Save snippet",

@@ -1,10 +1,10 @@
-import { window, Memento } from 'vscode';
-import SnippetRegistry from './SnippetRegistry';
+import { window } from 'vscode';
 import hostManager from './hostManager';
+import { HostRegistry } from './types';
 import { showTokenInput } from './updateToken';
 
-export default async function addHost(state: Memento) {
-  let host = await window.showInputBox({
+export default async function addHost(hostManage: ReturnType<typeof hostManager>): Promise<HostRegistry | undefined> {
+  const host = await window.showInputBox({
     ignoreFocusOut: true,
     prompt: 'Enter your Gitlab host',
     value: 'https://gitlab.com',
@@ -25,18 +25,10 @@ export default async function addHost(state: Memento) {
     placeHolder: 'Choose host API version',
     ignoreFocusOut: true,
   });
-  const registry = {
+
+  return hostManage.add({
     host,
     token,
-    version: (version && parseInt(version, 10)) || 4,
-  };
-  const api = new SnippetRegistry(registry);
-  const snippets = await api.getSnippets();
-
-  hostManager(state).add(registry);
-
-  return {
-    registry: api,
-    snippets,
-  };
+    version: version ? parseInt(version, 10) : 4,
+  });
 }

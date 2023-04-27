@@ -1,13 +1,16 @@
 import { SNIPPET_GROUP } from "./constants";
+import SnippetRegistry from "./SnippetRegistry";
 
 export interface Host {
   host: string;
   token: string;
   version: number;
 }
+export interface HostRegistry extends Host {
+  registry: SnippetRegistry;
+}
 
-export type StaredSnippet = Snippet & {
-  host: string;
+export interface StaredSnippet extends SnippetExtended {
   starTime: number;
 };
 
@@ -25,12 +28,15 @@ export interface Snippet {
   raw_url: string;
   files: SnippetFile[];
 }
+export interface SnippetExtended extends Snippet {
+  host: string;
+}
 export interface SnippetFile {
   path: string;
   raw_url: string;
 }
 export interface SnippetFileExtended extends SnippetFile {
-  snippet: Snippet
+  snippet: SnippetExtended;
 }
 
 export type NewSnippet = Pick<
@@ -44,7 +50,7 @@ export type SnippetGroup = SnippetGroupCategory | SnippetGroupProject;
 interface SnippetGroupBase {
   host: string,
   type: SNIPPET_GROUP;
-  snippets: Snippet[];
+  snippets: SnippetExtended[];
 }
 export interface SnippetGroupCategory extends SnippetGroupBase {
   type: SNIPPET_GROUP.category,

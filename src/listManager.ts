@@ -34,6 +34,7 @@ export default function listManager<T>(
   };
   return {
     key,
+    getId,
     get,
     getById,
     add,
