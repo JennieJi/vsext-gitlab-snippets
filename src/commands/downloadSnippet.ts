@@ -18,7 +18,7 @@ export default async function downloadSnippet(
     return;
   }
   fs.writeFile(
-    targetPath.path,
+    targetPath.fsPath,
     raw,
     (err) => err && window.showErrorMessage(err.message)
   );
