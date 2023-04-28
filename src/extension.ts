@@ -1,121 +1,120 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, TreeView } from "vscode";
+import { ExtensionContext, commands, TreeView, window } from "vscode";
 import commandName, { Command } from "./commandName";
-import addHost from "./addHost";
-import publish from "./publishSnippet";
-import configKey from "./configKey";
-import registerStaredView from "./views/staredView";
-import registerHostsView from "./views/hostsView";
-import registerMyView from "./views/myView";
-import { starSnippet, unstarSnippet } from "./starManager";
-import starById from "./starById";
-import viewSnippet from "./viewSnippet";
-import viewSnippetInBrowser from "./viewSnippetInBrowser";
-import { Snippet, StaredSnippet, Host } from "./types";
-import downloadSnippet from "./downloadSnippet";
-import { removeHostSelector, removeHost } from "./removeHost";
+import addHost from "./commands/addHost";
+import publish from "./commands/publishSnippet";
+import { StaredSnippetsProvider } from "./views/staredView";
+import { HostSnippetsProvider } from "./views/hostsView";
+import { MySnippetsProvider } from "./views/myView";
+import { starManager } from "./starManager";
+import starById from "./commands/starById";
+import viewSnippet from "./commands/viewSnippet";
+import viewSnippetInBrowser from "./commands/viewSnippetInBrowser";
+import { Snippet, StaredSnippet, Host, SnippetFileExtended, SnippetExtended } from "./types";
+import downloadSnippet from "./commands/downloadSnippet";
+import { removeHostSelector, removeHost } from "./commands/removeHost";
+import updateToken from "./commands/updateToken";
+import hostManager from "./hostManager";
 
 let views = [] as TreeView<any>[];
 
 export function activate(context: ExtensionContext) {
   const { subscriptions, globalState } = context;
-  const { view: staredView, dataProvider: staredProvider } = registerStaredView(
-    globalState
-  );
-  const {
-    view: hostsView,
-    dataProvider: hostSnippetsProvider,
-  } = registerHostsView(globalState);
-  const { view: myView, dataProvider: mySnippetsProvider } = registerMyView(
-    globalState
-  );
-  views = [staredView, hostsView, myView];
+  const hosts = hostManager(globalState);
+  const stared = starManager(globalState);
+  const staredSnippetsProvider = new StaredSnippetsProvider(stared);
+  const hostSnippetsProvider = new HostSnippetsProvider(hosts);
+  const mySnippetsProvider = new MySnippetsProvider(hosts);
+  views = [
+    window.createTreeView("gitlabSnippetsExplorer-stared", {
+      treeDataProvider: staredSnippetsProvider,
+    }),
+    window.createTreeView("gitlabSnippetsExplorer-all", {
+      treeDataProvider: hostSnippetsProvider,
+    }),
+    window.createTreeView("gitlabSnippetsExplorer-mine", {
+      treeDataProvider: mySnippetsProvider,
+    })
+  ];
+
+  const reloadHosts = (res: any) => {
+    if (res) {
+      hostSnippetsProvider.reload();
+      mySnippetsProvider.reload();
+    }
+  }
 
   [
     [
       "removeHostSelector",
       () =>
-        removeHostSelector(globalState).then((host) => {
-          if (globalState.get(configKey("lastUseHost")) === host) {
-            globalState.update(configKey("lastUseHost"), "");
-          }
-          hostSnippetsProvider.reload();
-          mySnippetsProvider.reload();
-        }),
+        removeHostSelector(hosts).then(reloadHosts),
     ],
     [
       "removeHost",
       (host: Host) =>
-        removeHost(globalState, host.host).then((host) => {
-          if (globalState.get(configKey("lastUseHost")) === host) {
-            globalState.update(configKey("lastUseHost"), "");
-          }
-          hostSnippetsProvider.reload();
-          mySnippetsProvider.reload();
-        }),
+        removeHost(hosts, host.host).then(reloadHosts),
     ],
     [
       "addHost",
-      async () => {
-        const { registry } = (await addHost(globalState)) || {};
-        if (registry) {
-          globalState.update(configKey("lastUseHost"), registry.host);
-          hostSnippetsProvider.openLastest();
-          mySnippetsProvider.openLastest();
-        }
-      },
+      () =>
+        addHost(hosts).then(reloadHosts)
     ],
     [
       "publish",
-      async () => {
-        const res = await publish(globalState);
-        mySnippetsProvider.reload(res?.registry?.host);
-      },
+      () =>
+        publish(hosts).then(res => {
+          if (res) {
+            mySnippetsProvider.reload(res.host);
+          }
+        })
     ],
-    ["reloadMySnippets", (host: Host) => mySnippetsProvider.reload(host)],
+    ["reloadMySnippets", ({ host }: Host) => mySnippetsProvider.reload(host)],
     [
       "reloadExploreSnippets",
-      (host: Host) => hostSnippetsProvider.reload(host),
+      ({ host }: Host) => hostSnippetsProvider.reload(host),
     ],
     [
       "star",
-      (snippet: Snippet) => {
-        starSnippet(globalState, snippet);
-        staredProvider.reload();
+      async (snippet: Snippet) => {
+        await stared.add(snippet);
+        staredSnippetsProvider.reload();
       },
     ],
     [
       "starById",
       async () => {
-        await starById(globalState);
-        staredProvider.reload();
+        await starById(hosts, stared);
+        staredSnippetsProvider.reload();
       },
     ],
     [
       "unstar",
-      (snippet: StaredSnippet) => {
-        unstarSnippet(globalState, snippet);
-        staredProvider.reload();
+      async (snippet: StaredSnippet) => {
+        await stared.remove(stared.getId(snippet));
+        staredSnippetsProvider.reload();
       },
     ],
     [
       "download",
-      (snippet: StaredSnippet | Snippet) =>
-        downloadSnippet(globalState, snippet),
+      (snippet: SnippetExtended | SnippetFileExtended) =>
+        downloadSnippet(hosts, snippet),
     ],
-    ["viewSnippet", viewSnippet],
+    ["viewSnippet", (snippet: SnippetExtended, path?: string) => viewSnippet(hosts, snippet, path)],
     ["viewSnippetInBrowser", viewSnippetInBrowser],
     ["exploreMore", () => hostSnippetsProvider.loadMore()],
+    ["updateToken", async ({ host }: Host) => {
+      await updateToken(hosts, host);
+      hostSnippetsProvider.reload(host);
+      mySnippetsProvider.reload(host);
+    }]
   ].forEach(([cmd, callback]) =>
     subscriptions.push(
       commands.registerCommand(
         commandName(cmd as Command),
         callback as () => void
       )
-    )
+    ),
   );
-  mySnippetsProvider.openLastest();
 }
 
 // this method is called when your extension is deactivated

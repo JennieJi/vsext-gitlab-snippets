@@ -3,15 +3,12 @@ import { TreeItem, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
 
 export default function getHostItem(
   { host }: Host,
-  isExpanded = false
+  isExpanded = false,
 ): TreeItem {
-  return {
-    label: host.replace(/\w+:\/\//, ''),
-    id: host,
-    contextValue: 'host',
-    collapsibleState: isExpanded
-      ? TreeItemCollapsibleState.Expanded
-      : TreeItemCollapsibleState.Collapsed,
-    iconPath: ThemeIcon.Folder,
-  };
+  const item = new TreeItem(host.replace(/\w+:\/\//, ''), isExpanded
+    ? TreeItemCollapsibleState.Expanded
+    : TreeItemCollapsibleState.Collapsed);
+  item.contextValue = 'host';
+  item.iconPath = new ThemeIcon('remote-explorer-view-icon');
+  return item;
 }

@@ -1,8 +1,9 @@
-import { window, Memento, workspace } from "vscode";
-import { Snippet, SnippetFileExtended } from "./types";
-import { SnippetItem } from "./SnippetRegistry";
+import { window, workspace } from "vscode";
+import { HostRegistry, Snippet, SnippetExtended } from "../types";
+import SnippetRegistry from "../SnippetRegistry";
 import fetch from "node-fetch";
 import * as yaml from "js-yaml";
+import hostManager from "../hostManager";
 
 interface Lang {
   ace_mode: string;
@@ -27,8 +28,9 @@ fetch(
     }
   });
 
-export default async function viewSnippet(state: Memento, snippet: Snippet, path?: string) {
-  const content = await new SnippetItem(state, snippet).getContent(path);
+export default async function viewSnippet(hosts: ReturnType<typeof hostManager>, snippet: SnippetExtended, path?: string) {
+  const { registry } = hosts.getById(snippet.host) as HostRegistry
+  const content = await registry.getSnippetContent(snippet.id, path);
   const fileExt = (path ?? snippet.file_name)?.match(/\.\w+$/)?.[0];
   const language = fileExt && langMap[fileExt]?.ace_mode;
   workspace

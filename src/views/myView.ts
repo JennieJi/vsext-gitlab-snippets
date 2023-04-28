@@ -3,85 +3,127 @@ import {
   TreeDataProvider,
   EventEmitter,
   Event,
-  Memento,
-  window,
+  TreeItemCollapsibleState,
+  ThemeIcon,
 } from "vscode";
-import { Host, Snippet, SnippetFileExtended } from "../types";
+import { Host, HostRegistry, SnippetExtended, SnippetFileExtended, SnippetGroup, Project } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
-import SnippetRegistry from "../SnippetRegistry";
 import hostManager from "../hostManager";
+import { SNIPPET_GROUP } from "../constants";
 
-export class SnippetsProvider implements TreeDataProvider<Host | Snippet | SnippetFileExtended> {
+const projectsCache: {
+  [host: string]: {
+    [project: string]: {
+      data: Project,
+      timestamp: number,
+    }
+  }
+} = {};
+
+export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup | SnippetExtended | SnippetFileExtended> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
-  private state: Memento;
+  private hosts: ReturnType<typeof hostManager>;
 
-  private _activeHost: string | undefined;
-  get activeHost() {
-    return this._activeHost || "";
-  }
-  set activeHost(val: string) {
-    this._activeHost = val;
+  constructor(hosts: ReturnType<typeof hostManager>) {
+    this.hosts = hosts;
   }
 
-  constructor(state: Memento) {
-    this.state = state;
-  }
-
-  private getHosts() {
-    return hostManager(this.state).get();
-  }
-
-  private getSnippets(host: Host) {
-    const registry = new SnippetRegistry(host);
-    return registry.getUserSnippets();
-  }
-
-  public reload(host?: Host) {
+  public reload(host?: string) {
     if (host) {
-      this.activeHost = host.host;
+      this.hosts.setLastUse(host);
     }
     this._onDidChangeTreeData.fire();
   }
-  public openLastest() {
-    const hosts = this.getHosts();
-    this.activeHost = hosts?.[0]?.host;
-    this.reload();
+
+  private async getGroupedSnippets(host: string): Promise<SnippetGroup[]> {
+    const { registry } = this.hosts.getById(host) as HostRegistry;
+    const snippets = await registry.getUserSnippets();
+    if (!snippets.length) { return []; }
+    const groups: {
+      [key: string]: SnippetGroup
+    } = {
+      global: {
+        type: SNIPPET_GROUP.category,
+        host,
+        label: "/",
+        snippets: []
+      }
+    };
+    snippets.forEach(snippet => {
+      const { project_id: projectId } = snippet;
+      let group = groups[projectId ?? 'global'];
+      if (!group && projectId) {
+        group = groups[projectId] = {
+          type: SNIPPET_GROUP.project,
+          projectId: projectId,
+          host,
+          snippets: []
+        };
+      }
+      group.snippets.push({ ...snippet, host });
+    });
+    return Object.values(groups)
   }
 
-  public async getChildren(el?: Host | Snippet): Promise<Host[] | Snippet[] | SnippetFileExtended[]> {
+  public async getChildren(el?: Host | SnippetGroup | SnippetExtended): Promise<Host[] | SnippetGroup[] | SnippetExtended[] | SnippetFileExtended[]> {
     if (!el) {
-      return this.getHosts();
+      return this.hosts.get();
     }
-    if ((el as Host).host) {
-      return this.getSnippets(el as Host);
+    if ((el as SnippetGroup).snippets) {
+      return (el as SnippetGroup).snippets;
     }
-    return (el as Snippet).files.map(f => ({
-      ...f,
-      snippet: el
-    } as SnippetFileExtended));
+    if ((el as SnippetExtended).id) {
+      return (el as SnippetExtended).files.map(f => ({
+        ...f,
+        snippet: el
+      } as SnippetFileExtended));
+    }
+    return this.getGroupedSnippets((el as Host).host);
   }
 
-  public getTreeItem(el: Host | Snippet | SnippetFileExtended): TreeItem {
-    if ((el as Host).host) {
-      return getHostItem(el as Host, this.activeHost === (el as Host).host);
+  private getGroupItem(group: SnippetGroup): TreeItem {
+    const item = new TreeItem('/');
+    item.contextValue = "snippetGroup";
+    item.iconPath = new ThemeIcon("folder");
+    if (group.type === SNIPPET_GROUP.project) {
+      const { registry } = this.hosts.getById(group.host) as HostRegistry;
+      const { host, projectId } = group;
+      const projectCache = projectsCache[host]?.[projectId];
+      item.label = projectCache?.data.path || `Project ${projectId.toString()}`;
+      if (!projectCache || Date.now() - projectCache.timestamp > 1000 * 60 * 60) {
+        registry.getProject(group.projectId).then(project => {
+          if (!projectsCache[host]) {
+            projectsCache[host] = {};
+          }
+          projectsCache[host][project.id] = {
+            data: project,
+            timestamp: Date.now(),
+          };
+          this.reload();
+        });
+      }
+      item.collapsibleState = TreeItemCollapsibleState.Collapsed;
+    } else {
+      item.label = group.label;
+      item.collapsibleState = TreeItemCollapsibleState.Expanded;
+    }
+    return item;
+  }
+
+  public async getTreeItem(el: Host | SnippetGroup | SnippetExtended | SnippetFileExtended): Promise<TreeItem> {
+    if ((el as SnippetGroup).snippets) {
+      return this.getGroupItem(el as SnippetGroup);
+    }
+    if ((el as SnippetExtended).id) {
+      return getSnippetItem(el as SnippetExtended, undefined, { hideAuthor: true });
     }
     if ((el as SnippetFileExtended).path) {
       const { path, snippet } = el as SnippetFileExtended;
-      return getSnippetItem(this.state, "mine-", snippet, path);
+      return getSnippetItem(snippet, path, { hideAuthor: true });
     }
-    return getSnippetItem(this.state, "mine-", el as Snippet);
+    return getHostItem(el as Host, this.hosts.getLastUse() === (el as Host).host);
   }
-}
-
-export default function registerView(state: Memento) {
-  const dataProvider = new SnippetsProvider(state);
-  return {
-    view: window.createTreeView("gitlabSnippetsExplorer-mine", {
-      treeDataProvider: dataProvider,
-    }),
-    dataProvider,
-  };
 }

@@ -1,12 +1,11 @@
 import * as path from 'path';
-import { window, Memento, QuickPickItem } from 'vscode';
-import SnippetRegistry from './SnippetRegistry';
+import { window, QuickPickItem } from 'vscode';
 import addHost from './addHost';
-import { VISIBILITY } from './constants';
-import hostManager from './hostManager';
+import { VISIBILITY } from '../constants';
+import hostManager from '../hostManager';
 import chooseHost from './chooseHost';
 
-export default async function publish(state: Memento) {
+export default async function publish(hostManage: ReturnType<typeof hostManager>) {
   const { activeTextEditor } = window;
   if (!activeTextEditor) {
     window.showErrorMessage('Please open a file first!');
@@ -18,19 +17,10 @@ export default async function publish(state: Memento) {
     return;
   }
 
-  const manageHosts = hostManager(state);
-  const hosts = manageHosts.get();
-  let api;
-  if (!hosts || !hosts.length) {
-    const res = await addHost(state);
-    api = res?.registry;
-  } else {
-    const hostConfig = await chooseHost(state);
-    if (!hostConfig) {
-      return;
-    }
-    api = new SnippetRegistry(hostConfig);
-  }
+  const hosts = hostManage.get();
+  const host = await (!hosts || !hosts.length ? addHost : chooseHost)(hostManage);
+  const api = host?.registry;
+  if (!api) { return; }
   const projects = await api?.getUserProjects() || [];
   const project = await window.showQuickPick(
     [
@@ -93,6 +83,6 @@ export default async function publish(state: Memento) {
   );
   return {
     snippet,
-    registry: api,
+    host: host?.host,
   };
 }

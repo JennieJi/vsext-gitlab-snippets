@@ -1,8 +1,6 @@
 import fetch, { Response } from "node-fetch";
-import { Memento, window } from "vscode";
-import { Host, Snippet, NewSnippet, StaredSnippet, Project } from "./types";
+import { Host, Snippet, NewSnippet, Project } from "./types";
 import { URLSearchParams, URL } from "url";
-import hostManager from "./hostManager";
 
 interface GitlabError {
   error: string,
@@ -73,6 +71,10 @@ class SnippetRegistry {
     }, page, perPage);
   }
 
+  public getProject(id: number): Promise<Project> {
+    return this.getJson(`projects/${id}`);
+  }
+
   public getUserSnippets(): Promise<Snippet[]> {
     return this.getJson("snippets");
   }
@@ -91,28 +93,3 @@ class SnippetRegistry {
   }
 }
 export default SnippetRegistry;
-
-export class SnippetItem {
-  registry?: SnippetRegistry;
-  snippet: Snippet;
-
-  constructor(state: Memento, snippet: Snippet) {
-    this.snippet = snippet;
-    const host =
-      (snippet as StaredSnippet).host ||
-      snippet.raw_url.replace(/^(\w+:\/\/)?([\w-\.]+)\/.*/, "$1$2");
-    let hostConfig = hostManager(state).getById(host);
-    if (!hostConfig) {
-      window.showErrorMessage(
-        `Lack of token for ${host}! Please add token and try again.`
-      );
-      return;
-    }
-    this.registry = new SnippetRegistry(hostConfig);
-  }
-  public getContent(path?: string): Promise<string> {
-    return (
-      this.registry?.getSnippetContent(this.snippet.id, path) || Promise.reject()
-    );
-  }
-}

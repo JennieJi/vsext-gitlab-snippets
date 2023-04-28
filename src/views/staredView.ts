@@ -3,14 +3,14 @@ import { SnippetFileExtended, StaredSnippet } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import { starManager } from "../starManager";
 
-class SnippetsProvider implements vscode.TreeDataProvider<StaredSnippet | SnippetFileExtended> {
+export class StaredSnippetsProvider implements vscode.TreeDataProvider<StaredSnippet | SnippetFileExtended> {
   private _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
-  private state: vscode.Memento;
+  private stared: ReturnType<typeof starManager>;
   readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData
     .event;
 
-  constructor(state: vscode.Memento) {
-    this.state = state;
+  constructor(stared: ReturnType<typeof starManager>) {
+    this.stared = stared;
   }
 
   public reload() {
@@ -19,9 +19,9 @@ class SnippetsProvider implements vscode.TreeDataProvider<StaredSnippet | Snippe
   public getTreeItem(stared: StaredSnippet | SnippetFileExtended): vscode.TreeItem {
     if ((stared as SnippetFileExtended).path) {
       const { path, snippet } = stared as SnippetFileExtended;
-      return getSnippetItem(this.state, "stared-", snippet, path);
+      return getSnippetItem(snippet, path);
     }
-    return getSnippetItem(this.state, "stared-", stared as StaredSnippet);
+    return getSnippetItem(stared as StaredSnippet);
   }
   public getChildren(el?: StaredSnippet): StaredSnippet[] | SnippetFileExtended[] {
     if (el) {
@@ -30,16 +30,6 @@ class SnippetsProvider implements vscode.TreeDataProvider<StaredSnippet | Snippe
         snippet: el,
       })) as SnippetFileExtended[];
     }
-    return starManager(this.state).get();
+    return this.stared.get();
   }
-}
-
-export default function registerView(state: vscode.Memento) {
-  const dataProvider = new SnippetsProvider(state);
-  return {
-    view: vscode.window.createTreeView("gitlabSnippetsExplorer-stared", {
-      treeDataProvider: dataProvider,
-    }),
-    dataProvider,
-  };
 }
