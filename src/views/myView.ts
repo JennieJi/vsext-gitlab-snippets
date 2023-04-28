@@ -6,11 +6,20 @@ import {
   TreeItemCollapsibleState,
   ThemeIcon,
 } from "vscode";
-import { Host, HostRegistry, SnippetExtended, SnippetFileExtended, SnippetGroup } from "../types";
+import { Host, HostRegistry, SnippetExtended, SnippetFileExtended, SnippetGroup, Project } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
 import hostManager from "../hostManager";
 import { SNIPPET_GROUP } from "../constants";
+
+const projectsCache: {
+  [host: string]: {
+    [project: string]: {
+      data: Project,
+      timestamp: number,
+    }
+  }
+} = {};
 
 export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup | SnippetExtended | SnippetFileExtended> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -39,7 +48,7 @@ export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup 
       global: {
         type: SNIPPET_GROUP.category,
         host,
-        label: "Global",
+        label: "/",
         snippets: []
       }
     };
@@ -75,29 +84,33 @@ export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup 
     return this.getGroupedSnippets((el as Host).host);
   }
 
-  private async getGroupItem(group: SnippetGroup): Promise<TreeItem> {
+  private getGroupItem(group: SnippetGroup): TreeItem {
+    const item = new TreeItem('/');
+    item.contextValue = "snippetGroup";
+    item.iconPath = new ThemeIcon("folder");
     if (group.type === SNIPPET_GROUP.project) {
-      let label = `Project ${group.projectId.toString()}`;
       const { registry } = this.hosts.getById(group.host) as HostRegistry;
-      try {
-        const project = await registry.getProject(group.projectId);
-        label = project.path;
-      } catch (e) {
-        // ignore
+      const { host, projectId } = group;
+      const projectCache = projectsCache[host]?.[projectId];
+      item.label = projectCache?.data.path || `Project ${projectId.toString()}`;
+      if (!projectCache || Date.now() - projectCache.timestamp > 1000 * 60 * 60) {
+        registry.getProject(group.projectId).then(project => {
+          if (!projectsCache[host]) {
+            projectsCache[host] = {};
+          }
+          projectsCache[host][project.id] = {
+            data: project,
+            timestamp: Date.now(),
+          };
+          this.reload();
+        });
       }
-      return {
-        label,
-        collapsibleState: TreeItemCollapsibleState.Collapsed,
-        contextValue: "snippetGroup",
-        iconPath: new ThemeIcon("folder"),
-      };
+      item.collapsibleState = TreeItemCollapsibleState.Collapsed;
+    } else {
+      item.label = group.label;
+      item.collapsibleState = TreeItemCollapsibleState.Expanded;
     }
-    return {
-      label: group.label,
-      collapsibleState: TreeItemCollapsibleState.Expanded,
-      contextValue: "snippetGroup",
-      iconPath: new ThemeIcon("folder"),
-    };
+    return item;
   }
 
   public async getTreeItem(el: Host | SnippetGroup | SnippetExtended | SnippetFileExtended): Promise<TreeItem> {
