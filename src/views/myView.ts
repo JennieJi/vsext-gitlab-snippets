@@ -6,6 +6,7 @@ import {
   TreeItemCollapsibleState,
   ThemeIcon,
 } from "vscode";
+import throttle from "lodash.throttle";
 import { Host, HostRegistry, SnippetExtended, SnippetFileExtended, SnippetGroup, Project } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
@@ -31,11 +32,12 @@ export class MySnippetsProvider implements TreeDataProvider<Host | SnippetGroup 
     this.hosts = hosts;
   }
 
+  private _reload = throttle(() => this._onDidChangeTreeData.fire(), 200);
   public reload(host?: string) {
     if (host) {
       this.hosts.setLastUse(host);
     }
-    this._onDidChangeTreeData.fire();
+    this._reload();
   }
 
   private async getGroupedSnippets(host: string): Promise<SnippetGroup[]> {

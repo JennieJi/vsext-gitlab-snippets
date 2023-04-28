@@ -5,6 +5,7 @@ import {
   Event,
   ThemeIcon,
 } from "vscode";
+import throttle from "lodash.throttle";
 import { Host, Snippet, SnippetExtended, SnippetFileExtended } from "../types";
 import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
@@ -24,11 +25,12 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
     this.hosts = hosts;
   }
 
+  private _reload = throttle(() => this._onDidChangeTreeData.fire(), 200);
   public reload(host?: string) {
     if (host) {
       this.hosts.setLastUse(host);
     }
-    this._onDidChangeTreeData.fire();
+    this._reload();
   }
 
   private getHosts() {
@@ -68,7 +70,7 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
 
   public loadMore() {
     this.activeLimit += PER_PAGE;
-    this._onDidChangeTreeData.fire();
+    this.reload();
   }
 
   public async getChildren(el?: Host | SnippetExtended): Promise<Host[] | SnippetExtended[] | SnippetFileExtended[]> {

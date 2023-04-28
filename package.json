@@ -252,6 +252,7 @@
     "@rollup/plugin-typescript": "^9.0.2",
     "@types/glob": "^7.1.1",
     "@types/js-yaml": "^4.0.0",
+    "@types/lodash.throttle": "^4.1.7",
     "@types/mocha": "^7.0.1",
     "@types/node": "^12.11.7",
     "@types/node-fetch": "^2.5.6",
@@ -267,6 +268,7 @@
   },
   "dependencies": {
     "js-yaml": "^4.0.0",
+    "lodash.throttle": "^4.1.1",
     "node-fetch": "^3.2.10"
   }
 }
