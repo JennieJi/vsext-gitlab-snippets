@@ -15,6 +15,6 @@ Access Tokens**.
 
 Copy the token generated, enter into the textbox. And select your GitLab API version. Latest API version is 4.
 
-And then you could use other commands like publish, add snippet by ID, or the snippets explorer to view, star, download the snippet into your workspace:
+And then you could use other commands like publish, add snippet by ID, or the snippets explorer to view, star, download, copy to clipboard and paste the snippet into your workspace:
 
 ![Explorer](https://i.imgur.com/jqZCttm.png)

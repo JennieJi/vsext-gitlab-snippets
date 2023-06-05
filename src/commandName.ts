@@ -4,6 +4,8 @@ export type Command =
   | "addHost"
   | "publish"
   | "download"
+  | "copyToClipboard"
+  | "copyToClipboardAndPaste"
   | "star"
   | "unstar"
   | "viewSnippet"
