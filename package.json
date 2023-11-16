@@ -81,9 +81,20 @@
         "title": "Download",
         "icon": "$(save)"
       },
-      {
-        "command": "gitlabSnippets.viewSnippet",
-        "title": "View"
+	  {
+        "command": "gitlabSnippets.copyToClipboard",
+        "title": "Copy to clipboard",
+        "icon": "$(copy)"
+      },
+	  {
+        "command": "gitlabSnippets.copyToClipboardAndPaste",
+        "title": "Copy to clipboard and paste",
+        "icon": "$(clippy)"
+	  },
+	  {
+		"command": "gitlabSnippets.viewSnippet",
+        "title": "View",
+		"icon": "$(open-preview)"
       },
       {
         "command": "gitlabSnippets.viewSnippetInBrowser",
@@ -140,6 +151,14 @@
           "when": "false"
         },
         {
+          "command": "gitlabSnippets.copyToClipboard",
+          "when": "false"
+        },
+        {
+          "command": "gitlabSnippets.copyToClipboardAndPaste",
+          "when": "false"
+        },
+        {
           "command": "gitlabSnippets.viewSnippet",
           "when": "false"
         },
@@ -183,6 +202,21 @@
           "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/",
           "group": "inline"
         },
+        {
+          "command": "gitlabSnippets.copyToClipboard",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.gitlabSnippetsConfiguration.defaultAction != copyToClipboard",
+          "group": "inline"
+        },
+        {
+          "command": "gitlabSnippets.copyToClipboardAndPaste",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.gitlabSnippetsConfiguration.defaultAction != copyToClipboardAndPaste",
+          "group": "inline"
+        },
+		{
+		  "command": "gitlabSnippets.viewSnippet",
+		  "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.gitlabSnippetsConfiguration.defaultAction != viewSnippet",
+		  "group": "inline"
+		},
         {
           "command": "gitlabSnippets.star",
           "when": "view =~ /gitlabSnippetsExplorer-(all|mine)/ && viewItem =~ /^snippet(Repo)?$/",
@@ -236,7 +270,23 @@
           "name": "Explore snippets"
         }
       ]
-    }
+    },
+	"configuration": {
+		"title": "GitLab Snippets Configuration",
+		"properties": {
+		  "gitlabSnippetsConfiguration.defaultAction": {
+			"type": "string",
+			"default": "copyToClipboard",
+			"description": "Set default action to perform on click of items (restart Visual Studio Code for changes to take effect)",
+			"enum": ["copyToClipboard", "copyToClipboardAndPaste", "viewSnippet"],
+			"enumDescriptions": [
+				"Copy snippet content to clipboard",
+				"Copy snippet content to clipboard and paste it",
+				"Open snippet file in a new tab"
+			  ]
+		  }
+		}
+	  }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
