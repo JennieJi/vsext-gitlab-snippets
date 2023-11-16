@@ -1,4 +1,4 @@
-import { ThemeIcon, TreeItem, TreeItemCollapsibleState , workspace} from "vscode";
+import { ThemeIcon, TreeItem, TreeItemCollapsibleState, workspace } from "vscode";
 import { SnippetExtended } from "../types";
 import commandName from "../commandName";
 
@@ -20,19 +20,19 @@ export default function getSnippetItem(
       item.collapsibleState = TreeItemCollapsibleState.Collapsed,
       item.tooltip = tooltip;
   } else {
-	item.command = {
-		  command: commandName("viewSnippet"),
-		  arguments: [snippet, path],
-		  title: `Preview snippet`,
-	};
-	if(workspace.getConfiguration('gitlabSnippetsConfiguration').get('defaultAction') == "copyToClipboard") {
-		item.command.command = commandName("copyToClipboard");
-		item.command.title = `Copy snippet content to clipboard`;
-	} 
-	else if(workspace.getConfiguration('gitlabSnippetsConfiguration').get('defaultAction')  == "copyToClipboardAndPaste") {
-		item.command.command = commandName("copyToClipboardAndPaste");
-		item.command.title = `Copy snippet content to clipboard and paste it`;
-	} 
+    item.command = {
+      command: commandName("viewSnippet"),
+      arguments: [snippet, path],
+      title: `Preview snippet`,
+    };
+    if (workspace.getConfiguration('glabSnippetsConfiguration').get('defaultAction') == "copyToClipboard") {
+      item.command.command = commandName("copyToClipboard");
+      item.command.title = `Copy snippet content to clipboard`;
+    }
+    else if (workspace.getConfiguration('glabSnippetsConfiguration').get('defaultAction') == "copyToClipboardAndPaste") {
+      item.command.command = commandName("copyToClipboardAndPaste");
+      item.command.title = `Copy snippet content to clipboard and paste it`;
+    }
     item.iconPath = new ThemeIcon("code");
     if (path) {
       item.label = path;

@@ -1,10 +1,10 @@
 {
-  "name": "gitlab-snippets",
-  "displayName": "GitLab Snippets",
-  "description": "Use gilab snippets easily",
+  "name": "glab-snippets",
+  "displayName": "GLab Snippets",
+  "description": "Use snippets from GitLab easily",
   "version": "0.5.1",
   "publisher": "jyee721",
-  "icon": "resources/icons/gitlab-logo.png",
+  "icon": "resources/icons/logo.png",
   "author": {
     "name": "Jennie Ji",
     "email": "jennie.ji@hotmail.com"
@@ -41,23 +41,23 @@
     "commands": [
       {
         "command": "gitlabSnippets.publish",
-        "category": "GitLab Snippets",
+        "category": "GLab Snippets",
         "title": "Publish to GitLab snippets"
       },
       {
         "command": "gitlabSnippets.addHost",
-        "category": "GitLab Snippets",
+        "category": "GLab Snippets",
         "title": "Add GitLab host",
         "icon": "$(search-expand-results)"
       },
       {
         "command": "gitlabSnippets.removeHostSelector",
-        "category": "GitLab Snippets",
+        "category": "GLab Snippets",
         "title": "Remove GitLab host"
       },
       {
         "command": "gitlabSnippets.removeHost",
-        "category": "GitLab Snippets",
+        "category": "GLab Snippets",
         "title": "Remove GitLab host",
         "icon": "$(notebook-delete-cell)"
       },
@@ -68,7 +68,7 @@
       },
       {
         "command": "gitlabSnippets.starById",
-        "category": "GitLab Snippets",
+        "category": "GLab Snippets",
         "title": "Add snippet by ID",
         "icon": "$(add)"
       },
@@ -205,17 +205,17 @@
         },
         {
           "command": "gitlabSnippets.copyToClipboard",
-          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.gitlabSnippetsConfiguration.defaultAction != copyToClipboard",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.glabSnippetsConfiguration.defaultAction != copyToClipboard",
           "group": "inline"
         },
         {
           "command": "gitlabSnippets.copyToClipboardAndPaste",
-          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.gitlabSnippetsConfiguration.defaultAction != copyToClipboardAndPaste",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.glabSnippetsConfiguration.defaultAction != copyToClipboardAndPaste",
           "group": "inline"
         },
 		{
 		  "command": "gitlabSnippets.viewSnippet",
-		  "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.gitlabSnippetsConfiguration.defaultAction != viewSnippet",
+		  "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.glabSnippetsConfiguration.defaultAction != viewSnippet",
 		  "group": "inline"
 		},
         {
@@ -251,8 +251,8 @@
       "activitybar": [
         {
           "id": "gitlabSnippetsExplorer",
-          "title": "GitLab Snippets Explorer",
-          "icon": "resources/icons/gitlab-logo.svg"
+          "title": "Snippets Explorer",
+          "icon": "resources/icons/logo.svg"
         }
       ]
     },
@@ -273,9 +273,9 @@
       ]
     },
 	"configuration": {
-		"title": "GitLab Snippets Configuration",
+		"title": "GLab Snippets Configuration",
 		"properties": {
-		  "gitlabSnippetsConfiguration.defaultAction": {
+		  "glabSnippetsConfiguration.defaultAction": {
 			"type": "string",
 			"default": "copyToClipboard",
 			"description": "Set default action to perform on click of items (restart Visual Studio Code for changes to take effect)",
