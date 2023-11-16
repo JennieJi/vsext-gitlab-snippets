@@ -2,7 +2,7 @@
   "name": "glab-snippets",
   "displayName": "GLab Snippets",
   "description": "Use snippets from GitLab easily",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "publisher": "jyee721",
   "icon": "resources/icons/logo.png",
   "author": {
