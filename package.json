@@ -1,10 +1,10 @@
 {
-  "name": "gitlab-snippets",
-  "displayName": "GitLab Snippets",
-  "description": "Use gilab snippets easily",
+  "name": "glab-snippets",
+  "displayName": "GLab Snippets",
+  "description": "Use snippets from GitLab easily",
   "version": "0.5.1",
   "publisher": "jyee721",
-  "icon": "resources/icons/gitlab-logo.png",
+  "icon": "resources/icons/logo.png",
   "author": {
     "name": "Jennie Ji",
     "email": "jennie.ji@hotmail.com"
@@ -216,8 +216,8 @@
       "activitybar": [
         {
           "id": "gitlabSnippetsExplorer",
-          "title": "GitLab Snippets Explorer",
-          "icon": "resources/icons/gitlab-logo.svg"
+          "title": "Snippets Explorer",
+          "icon": "resources/icons/logo.svg"
         }
       ]
     },
