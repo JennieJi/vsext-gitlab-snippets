@@ -2,7 +2,7 @@
   "name": "glab-snippets",
   "displayName": "GLab Snippets",
   "description": "Use snippets from GitLab easily",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "publisher": "jyee721",
   "icon": "resources/icons/logo.png",
   "author": {
@@ -82,20 +82,20 @@
         "title": "Download",
         "icon": "$(save)"
       },
-	  {
+      {
         "command": "gitlabSnippets.copyToClipboard",
         "title": "Copy to clipboard",
         "icon": "$(copy)"
       },
-	  {
+      {
         "command": "gitlabSnippets.copyToClipboardAndPaste",
         "title": "Copy to clipboard and paste",
         "icon": "$(clippy)"
-	  },
-	  {
-		"command": "gitlabSnippets.viewSnippet",
+      },
+      {
+        "command": "gitlabSnippets.viewSnippet",
         "title": "View",
-		"icon": "$(open-preview)"
+        "icon": "$(open-preview)"
       },
       {
         "command": "gitlabSnippets.viewSnippetInBrowser",
@@ -213,11 +213,11 @@
           "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.glabSnippetsConfiguration.defaultAction != copyToClipboardAndPaste",
           "group": "inline"
         },
-		{
-		  "command": "gitlabSnippets.viewSnippet",
-		  "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.glabSnippetsConfiguration.defaultAction != viewSnippet",
-		  "group": "inline"
-		},
+        {
+          "command": "gitlabSnippets.viewSnippet",
+          "when": "view =~ /gitlabSnippetsExplorer/ && viewItem =~ /^snippet(File)?$/ && config.glabSnippetsConfiguration.defaultAction != viewSnippet",
+          "group": "inline"
+        },
         {
           "command": "gitlabSnippets.star",
           "when": "view =~ /gitlabSnippetsExplorer-(all|mine)/ && viewItem =~ /^snippet(Repo)?$/",
@@ -272,22 +272,26 @@
         }
       ]
     },
-	"configuration": {
-		"title": "GLab Snippets Configuration",
-		"properties": {
-		  "glabSnippetsConfiguration.defaultAction": {
-			"type": "string",
-			"default": "copyToClipboard",
-			"description": "Set default action to perform on click of items (restart Visual Studio Code for changes to take effect)",
-			"enum": ["copyToClipboard", "copyToClipboardAndPaste", "viewSnippet"],
-			"enumDescriptions": [
-				"Copy snippet content to clipboard",
-				"Copy snippet content to clipboard and paste it",
-				"Open snippet file in a new tab"
-			  ]
-		  }
-		}
-	  }
+    "configuration": {
+      "title": "GLab Snippets Configuration",
+      "properties": {
+        "glabSnippetsConfiguration.defaultAction": {
+          "type": "string",
+          "default": "copyToClipboard",
+          "description": "Set default action to perform on click of items (restart Visual Studio Code for changes to take effect)",
+          "enum": [
+            "copyToClipboard",
+            "copyToClipboardAndPaste",
+            "viewSnippet"
+          ],
+          "enumDescriptions": [
+            "Copy snippet content to clipboard",
+            "Copy snippet content to clipboard and paste it",
+            "Open snippet file in a new tab"
+          ]
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
