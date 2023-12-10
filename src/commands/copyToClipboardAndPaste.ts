@@ -4,17 +4,17 @@ import hostManager from "../hostManager";
 
 export default async function copyToClipboardAndPaste(
   hosts: ReturnType<typeof hostManager>,
-  source: SnippetExtended | SnippetFileExtended,
+  snippet: SnippetExtended,
+  path?: string,
   paste: Boolean = true
 ) {
-  const snippet = (source as SnippetFileExtended).snippet ?? source;
   const { registry } = hosts.getById(snippet.host) as HostRegistry;
-  const raw = await registry.getSnippetContent(snippet.id, (source as SnippetFileExtended).path);
+  const raw = await registry.getSnippetContent(snippet.id, path);
 
   await env.clipboard.writeText(raw);
   window.showInformationMessage('Snippet copied to clipboard.');
   if (paste) {
-  	commands.executeCommand("editor.action.clipboardPasteAction");
+    commands.executeCommand("editor.action.clipboardPasteAction");
   }
- 
+
 }

@@ -5,11 +5,11 @@ import hostManager from "../hostManager";
 
 export default async function downloadSnippet(
   hosts: ReturnType<typeof hostManager>,
-  source: SnippetExtended | SnippetFileExtended
+  snippet: SnippetExtended,
+  path?: string
 ) {
-  const snippet = (source as SnippetFileExtended).snippet ?? source;
   const { registry } = hosts.getById(snippet.host) as HostRegistry;
-  const raw = await registry.getSnippetContent(snippet.id, (source as SnippetFileExtended).path);
+  const raw = await registry.getSnippetContent(snippet.id, path);
   const targetPath = await window.showSaveDialog({
     defaultUri: workspace.workspaceFile,
     saveLabel: "Save snippet",

@@ -11,7 +11,6 @@ import viewSnippet from "./commands/viewSnippet";
 import viewSnippetInBrowser from "./commands/viewSnippetInBrowser";
 import { Snippet, StaredSnippet, Host, SnippetFileExtended, SnippetExtended } from "./types";
 import downloadSnippet from "./commands/downloadSnippet";
-import copyToClipboard from "./commands/copyToClipboardAndPaste";
 import copyToClipboardAndPaste from "./commands/copyToClipboardAndPaste";
 import { removeHostSelector, removeHost } from "./commands/removeHost";
 import updateToken from "./commands/updateToken";
@@ -98,18 +97,18 @@ export function activate(context: ExtensionContext) {
     ],
     [
       "download",
-      (snippet: SnippetExtended | SnippetFileExtended) =>
-        downloadSnippet(hosts, snippet),
+      (snippet: SnippetExtended, path?: string) =>
+        downloadSnippet(hosts, snippet, path),
     ],
     [
       "copyToClipboard",
-      (snippet: SnippetExtended | SnippetFileExtended) =>
-	  	copyToClipboard(hosts, snippet, false),
+      (snippet: SnippetExtended, path?: string) =>
+        copyToClipboardAndPaste(hosts, snippet, path, false),
     ],
     [
       "copyToClipboardAndPaste",
-      (snippet: SnippetExtended | SnippetFileExtended) =>
-	    copyToClipboardAndPaste(hosts, snippet),
+      (snippet: SnippetExtended, path?: string) =>
+        copyToClipboardAndPaste(hosts, snippet, path),
     ],
     ["viewSnippet", (snippet: SnippetExtended, path?: string) => viewSnippet(hosts, snippet, path)],
     ["viewSnippetInBrowser", viewSnippetInBrowser],
