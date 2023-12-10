@@ -97,18 +97,18 @@ export function activate(context: ExtensionContext) {
     ],
     [
       "download",
-      (snippet: SnippetExtended | SnippetFileExtended) =>
-        downloadSnippet(hosts, snippet),
+      (snippet: SnippetExtended, path?: string) =>
+        downloadSnippet(hosts, snippet, path),
     ],
     [
       "copyToClipboard",
-      (snippet: SnippetExtended | SnippetFileExtended) =>
-	  	copyToClipboardAndPaste(hosts, snippet, false),
+      (snippet: SnippetExtended, path?: string) =>
+        copyToClipboardAndPaste(hosts, snippet, path, false),
     ],
     [
       "copyToClipboardAndPaste",
-      (snippet: SnippetExtended | SnippetFileExtended) =>
-	    copyToClipboardAndPaste(hosts, snippet),
+      (snippet: SnippetExtended, path?: string) =>
+        copyToClipboardAndPaste(hosts, snippet, path),
     ],
     ["viewSnippet", (snippet: SnippetExtended, path?: string) => viewSnippet(hosts, snippet, path)],
     ["viewSnippetInBrowser", viewSnippetInBrowser],

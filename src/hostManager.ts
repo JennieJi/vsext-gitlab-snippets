@@ -12,17 +12,14 @@ export default function hostManager(state: Memento) {
     [host: string]: SnippetRegistry
   } = {};
   const initRegistry = (host: Host) => {
-    registries[host.host] = new SnippetRegistry(host);
+    return registries[host.host] = new SnippetRegistry(host);
   }
-  const getById = (host: string): HostRegistry| undefined => {
+  const getById = (host: string): HostRegistry | undefined => {
     const item = helpers.getById(host);
     if (!item) { return; }
-    if (!registries[host]) {
-      initRegistry(item as Host);
-    }
     return {
       ...item,
-      registry: registries[host]
+      registry: registries[host] ?? initRegistry(item as Host)
     };
   };
   const getLastUse = (): string => (state.get(LAST_USE) || helpers.get()?.[0]?.host || "");
