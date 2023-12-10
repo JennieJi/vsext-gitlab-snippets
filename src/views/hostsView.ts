@@ -11,6 +11,7 @@ import getSnippetItem from "./getSnippetItem";
 import getHostItem from "./getHostItem";
 import hostManager from "../hostManager";
 import commandName from "../commandName";
+import SnippetRegistry from "../SnippetRegistry";
 
 const PER_PAGE = 20;
 
@@ -33,19 +34,6 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
     this._reload();
   }
 
-  private getHosts() {
-    const storedHosts = this.hosts.get();
-    if (storedHosts.find(h => h.host === 'https://gitlab.com' || h.host === 'https://www.gitlab.com/')) {
-      return storedHosts;
-    }
-    return [...storedHosts,
-    {
-      host: 'https://gitlab.com',
-      token: 'glpat-vuVzP8sbzKZHBYRcXmyB',
-      version: 4,
-    }];
-  }
-
   private getLoadMoreItem(): TreeItem {
     return {
       label: "Load more ...",
@@ -57,15 +45,12 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
     };
   }
 
-  private getSnippets(host: string): Promise<SnippetExtended[]> {
-    const hostRegistry = this.hosts.getById(host);
-    if (hostRegistry) {
-      return hostRegistry.registry.getSnippets(1, this.activeLimit)
-        .then(snippets =>
-          snippets.map(s => ({ ...s, host }))
-        );
-    }
-    return Promise.reject('Host not found');
+  private getSnippets(host: Host): Promise<SnippetExtended[]> {
+    const registry = new SnippetRegistry(host);
+    return registry.getSnippets(1, this.activeLimit)
+      .then(snippets =>
+        snippets.map(s => ({ ...s, host: host.host }))
+      );
   }
 
   public loadMore() {
@@ -75,7 +60,7 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
 
   public async getChildren(el?: Host | SnippetExtended): Promise<Host[] | SnippetExtended[] | SnippetFileExtended[]> {
     if (!el) {
-      return this.getHosts();
+      return this.hosts.get();
     }
     if ((el as SnippetExtended).id) {
       return (el as SnippetExtended).files.map(f => ({
@@ -83,8 +68,7 @@ export class HostSnippetsProvider implements TreeDataProvider<Host | SnippetExte
         snippet: el
       } as SnippetFileExtended));
     }
-    const host = (el as Host).host;
-    return this.getSnippets(host).then(snippets =>
+    return this.getSnippets(el as Host).then(snippets =>
       snippets.length === this.activeLimit
         ? [...snippets, {} as SnippetExtended]
         : snippets

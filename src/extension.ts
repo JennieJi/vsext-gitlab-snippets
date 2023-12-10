@@ -11,7 +11,6 @@ import viewSnippet from "./commands/viewSnippet";
 import viewSnippetInBrowser from "./commands/viewSnippetInBrowser";
 import { Snippet, StaredSnippet, Host, SnippetFileExtended, SnippetExtended } from "./types";
 import downloadSnippet from "./commands/downloadSnippet";
-import copyToClipboard from "./commands/copyToClipboardAndPaste";
 import copyToClipboardAndPaste from "./commands/copyToClipboardAndPaste";
 import { removeHostSelector, removeHost } from "./commands/removeHost";
 import updateToken from "./commands/updateToken";
@@ -104,7 +103,7 @@ export function activate(context: ExtensionContext) {
     [
       "copyToClipboard",
       (snippet: SnippetExtended | SnippetFileExtended) =>
-	  	copyToClipboard(hosts, snippet, false),
+	  	copyToClipboardAndPaste(hosts, snippet, false),
     ],
     [
       "copyToClipboardAndPaste",

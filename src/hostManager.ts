@@ -14,7 +14,7 @@ export default function hostManager(state: Memento) {
   const initRegistry = (host: Host) => {
     registries[host.host] = new SnippetRegistry(host);
   }
-  const getById = (host: string) => {
+  const getById = (host: string): HostRegistry| undefined => {
     const item = helpers.getById(host);
     if (!item) { return; }
     if (!registries[host]) {
